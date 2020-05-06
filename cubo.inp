@@ -1,0 +1,77 @@
+*NODE
+1, 0, 0, 0
+2, 1, 1, 0
+3, 0, 1, 0
+4, 1, 0, 0
+5, 1, 1, 2
+6, 0, 1, 2
+7, 0, 0, 2
+8, 1, 0, 2
+9, 1, 1, 1
+10, 0, 1, 1
+11, 0, 0, 1
+12, 1, 0, 1
+******* E L E M E N T S *************
+*ELEMENT, type=T3D2, ELSET=Line1
+11, 3, 1
+*ELEMENT, type=T3D2, ELSET=Line2
+12, 1, 4
+*ELEMENT, type=T3D2, ELSET=Line3
+13, 4, 2
+*ELEMENT, type=T3D2, ELSET=Line4
+14, 2, 3
+*ELEMENT, type=T3D2, ELSET=Line5
+15, 2, 9
+16, 9, 5
+*ELEMENT, type=T3D2, ELSET=Line6
+17, 3, 10
+18, 10, 6
+*ELEMENT, type=T3D2, ELSET=Line7
+19, 5, 6
+*ELEMENT, type=T3D2, ELSET=Line8
+20, 1, 11
+21, 11, 7
+*ELEMENT, type=T3D2, ELSET=Line9
+22, 6, 7
+*ELEMENT, type=T3D2, ELSET=Line10
+23, 4, 12
+24, 12, 8
+*ELEMENT, type=T3D2, ELSET=Line11
+25, 7, 8
+*ELEMENT, type=T3D2, ELSET=Line12
+26, 8, 5
+*ELEMENT, type=CPS4, ELSET=Surface1
+1, 1, 4, 2, 3
+*ELEMENT, type=CPS4, ELSET=Surface2
+27, 2, 3, 10, 9
+28, 9, 10, 6, 5
+*ELEMENT, type=CPS4, ELSET=Surface3
+29, 3, 1, 11, 10
+30, 10, 11, 7, 6
+*ELEMENT, type=CPS4, ELSET=Surface4
+31, 1, 4, 12, 11
+32, 11, 12, 8, 7
+*ELEMENT, type=CPS4, ELSET=Surface5
+33, 4, 2, 9, 12
+34, 12, 9, 5, 8
+*ELEMENT, type=CPS4, ELSET=Surface6
+2, 7, 8, 5, 6
+*ELEMENT, type=C3D8, ELSET=Volume1
+35, 1, 4, 2, 3, 11, 12, 9, 10
+36, 11, 12, 9, 10, 7, 8, 5, 6
+*ELSET,ELSET=BC_Neumann_X_0
+2, 
+*ELSET,ELSET=BC_Neumann_Y_0
+2, 
+*ELSET,ELSET=BC_Neumann_Z_0
+2, 
+*ELSET,ELSET=BC_Dirichlet_X_0
+1, 
+*NSET,NSET=BC_Neumann_X_0
+5, 6, 7, 8, 
+*NSET,NSET=BC_Neumann_Y_0
+5, 6, 7, 8, 
+*NSET,NSET=BC_Neumann_Z_0
+5, 6, 7, 8, 
+*NSET,NSET=BC_Dirichlet_X_0
+1, 2, 3, 4, 
