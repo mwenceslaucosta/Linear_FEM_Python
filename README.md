@@ -1,2 +1,2 @@
 # FEM_Python-
-Fem code with material non linearity and linear kinematics
+Fem code with material nonlinearity and linear kinematics
