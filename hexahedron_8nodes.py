@@ -11,19 +11,24 @@ class Hexaedron_8nodes:
     """ 
     class to formulate 8 nodes isoparametric hexahedron element. 
     """
-    def __init__(self):
+    def __init__(self,mesh,element_number):
         self.n_gauss=8
-        self.n_nodes=8
-        self.phi=np.zeros((self.n_nodes,self.n_gauss))
-        self.jacobian=np.zeros((3,3)) 
+        self.n_nodes_element=8
+        self.GDL_no_element=3
+        self.element_number=element_number
+        self.coordinantes_elem=np.zeros((8,self.GDL_no_element))
+        self.get_coordinantes_nodes_elem(mesh)
+        self.phi=np.zeros((self.n_nodes_element,self.n_gauss))
+        self.jacobian=np.zeros((self.GDL_no_element,self.GDL_no_element)) 
         self.det_Jacobian=np.zeros(self.n_gauss)
         self.B=np.zeros((6*self.n_gauss,24))
         self.deri_phi_real=np.zeros((3*self.n_gauss,8))
         self.deri_phi_param=np.zeros((3,self.n_gauss))
         self.Ke=np.zeros((24,24))
-        self.gauss_coordinates=np.zeros((8,3))
-        self.gauss_weight=np.zeros((8,3))
+        self.gauss_coordinates=np.zeros((8,self.GDL_no_element))
+        self.gauss_weight=np.zeros((8,self.GDL_no_element))
         self.get_gauss_parametric_coordinante_and_weight()
+
 #-----------------------------------------------------------------------------    
         
     def inter_element(self):
@@ -48,7 +53,7 @@ class Hexaedron_8nodes:
             cont+=1
 #-----------------------------------------------------------------------------    
     
-    def jacobian_element(self,cd_nodes):
+    def jacobian_element(self):
         """
         Method to calculate the Jacobian, his determinant and the 
         derivative of interpolate functions for all quadrature points
@@ -59,14 +64,14 @@ class Hexaedron_8nodes:
         self.deri_phi_real[3:6,:]= derivatives of phi of the 2° gauss point. .
         """ 
        
-        cd_no1=cd_nodes[0,:] 
-        cd_no2=cd_nodes[1,:]  
-        cd_no3=cd_nodes[2,:]  
-        cd_no4=cd_nodes[3,:] 
-        cd_no5=cd_nodes[4,:]  
-        cd_no6=cd_nodes[5,:]  
-        cd_no7=cd_nodes[6,:]  
-        cd_no8=cd_nodes[7,:] 
+        cd_no1=self.coordinantes_elem[0,:] 
+        cd_no2=self.coordinantes_elem[1,:]  
+        cd_no3=self.coordinantes_elem[2,:]  
+        cd_no4=self.coordinantes_elem[3,:] 
+        cd_no5=self.coordinantes_elem[4,:]  
+        cd_no6=self.coordinantes_elem[5,:]  
+        cd_no7=self.coordinantes_elem[6,:]  
+        cd_no8=self.coordinantes_elem[7,:] 
         cont=0
         self.jacobian[:,:]=0
         self.deri_phi_real[:,:]=0
@@ -235,11 +240,12 @@ class Hexaedron_8nodes:
 
 #-----------------------------------------------------------------------------# 
             
-    def Ke_element(self,constitutive_model,displacement): 
+    def get_Ke_element(self,material,displacement=0): 
         """
         Method to compute elementary stiffness.
         """
         self.Ke[:,:]=0
+        cont=0
         for i in range(self.n_gauss):
             #Posso enviar para o modelo constitutivo a informaçao de cada ponto
             #Gauss. Isto é, a matriz B de cada ponto de Gauss e o deslocamento 
@@ -250,15 +256,22 @@ class Hexaedron_8nodes:
             #A rotina de atualizaçao das forças internas estara dentro da rotina material.
             #tg_modu: Tangent modulus
             #Chamada modelo constitutivo para obter modulo_tangente.
+            material.get_tangent_modulus(displacement,self)
             w_i=self.gauss_weight[i,0]
             w_j=self.gauss_weight[i,1]
             w_k=self.gauss_weight[i,2]
             B_t=np.transpose(self.B[cont:cont+6,:])
-            self.Ke+=(np.matmul(B_t,(np.matmul(tg_modu,self.B[cont:cont+6,:])))
-                      *self.det_Jacobian[i]*w_i*w_j*w_k)                      
+            self.Ke+=(np.matmul(B_t,(np.matmul(material.tangent_modulus,self.B[cont:cont+6,:])))
+                                     *self.det_Jacobian[i]*w_i*w_j*w_k)                      
             cont+=6
                 
-            
-        
-
+#-----------------------------------------------------------------------------# 
+                   
+    def get_coordinantes_nodes_elem(self,mesh):
+        """
+        Method to allocate element coordinates
+        """
+        for i in range(self.n_nodes_element):
+            n_no=mesh.connectivity[self.element_number,i]
+            self.coordinantes_elem[i,:]=mesh.nodes[n_no,:]
 
