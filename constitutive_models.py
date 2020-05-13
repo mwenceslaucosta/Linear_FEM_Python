@@ -21,7 +21,7 @@ class linear_elasticity_iso_3D:
         
 #-----------------------------------------------------------------------------# 
         
-    def get_tangent_modulus(self,displacemente,element):
+    def get_tangent_modulus(self,displacement,element):
         """
         Method to compute tangen modulus
         """ 

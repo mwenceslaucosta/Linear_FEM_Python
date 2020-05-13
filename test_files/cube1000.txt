@@ -1,0 +1,40 @@
+//+
+Point(1) = {0, 0, 0, 1.0};
+//+
+Point(2) = {0, 20, 0, 1.0};
+//+
+Point(3) = {0, 20, 20, 1.0};
+//+
+Point(4) = {0, 0, 20, 1.0};
+//+
+Line(1) = {4, 4};
+//+
+Line(2) = {4, 1};
+//+
+Line(3) = {1, 2};
+//+
+Line(4) = {2, 3};
+//+
+Line(5) = {3, 4};
+//+
+Curve Loop(1) = {2, 3, 4, 5};
+//+
+Plane Surface(1) = {1};
+//+
+Transfinite Surface {1} = {1, 4, 3, 2};
+//+
+Transfinite Curve {2, 4, 3, 5} = 11 Using Progression 1;
+//+
+Recombine Surface {1};
+//+
+Extrude {200, 0, 0} {
+  Surface{1}; Layers{10}; Recombine;
+}
+//+
+Physical Surface("BC_Dirichlet_Z_0") = {1};
+//+
+Physical Surface("BC_Dirichlet_Y_0") = {1};
+//+
+Physical Surface("BC_Dirichlet_X_0") = {1};
+//+
+Physical Surface("BC_Neumann_point_X_0") = {27};

@@ -201,12 +201,14 @@ class MeshFEM:
                 cont=len(read_mesh.cells_dict['hexahedron'])  
                 self.n_nodes_element=8
                 self.n_GDL_node_element=3
+                self.n_GDL_el=self.n_nodes_element*self.n_GDL_node_element
             if "tetra" in read_mesh.cells_dict:
                 sys.exit('Tetrahedral element not implemented.')
                 self.connectivity=read_mesh.cells_dict['tetra']
                 cont=len(read_mesh.cells_dict['tetra'])
                 self.n_nodes_element=4
                 self.n_GDL_node_element=3
+
         elif self.analysis_dimension=='2D_plane_stress':
             sys.exit('Type of analysis not implemented')
             if "quad" in read_mesh.cells_dict: 

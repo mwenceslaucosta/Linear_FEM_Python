@@ -5,13 +5,15 @@ Created on Sat May  9 17:03:20 2020
 @author: mathe
 """
 import numpy as np 
+from scipy.sparse import linalg
 import os 
 from mesh import MeshFEM 
 from hexahedron_8nodes import Hexaedron_8nodes
 from inload import Inload
 from constitutive_models import linear_elasticity_iso_3D
-from assembly_KGlob import KGlobal
 from dirichlet_bc_imposition import Dirichlet_imposition
+from assembly_KGlob import Assembly_KGlob
+
 
 class Test_FEM_Class:
     """
@@ -84,105 +86,70 @@ class Test_FEM_Class:
         for i in range(mesh.n_elements):     
             self.element[i].get_Ke_element(material[i]) 
         assert np.allclose(self.element[1].Ke,self.Ke_1)
+ 
+        
 #-----------------------------------------------------------------------------# 
         
-    def test_global_stiffness(self):
+    def test_displacement_cube_2_elements(self):
         f='test_files'
-        self.KG=np.loadtxt(os.path.join(f,'KG_cube2.csv'),delimiter=',')
+        displacement_cube2=np.loadtxt(os.path.join(f,'displacement_cube2.csv'),delimiter=',')
+        mesh_name=os.path.join('test_files','cube2.inp')
+        displacement_computed=self.get_displacement(mesh_name)
+        
+        assert np.allclose(displacement_computed,displacement_cube2)
+
+#-----------------------------------------------------------------------------# 
+        
+    def test_displacement_cube_1000_elements(self):
+        f='test_files'
+        displacement_cube1000=np.loadtxt(os.path.join(f,'displacement_cube1000.csv'),delimiter=',')
+        mesh_name=os.path.join('test_files','cube1000.inp')
+        displacement_computed=self.get_displacement(mesh_name)
+        
+        assert np.allclose(displacement_computed,displacement_cube1000)
+
+#-----------------------------------------------------------------------------# 
+        
+    def get_displacement(self,mesh_name):
         config_mesh={}
-        config_mesh['mesh_file_name']=os.path.join('test_files','cube2.inp')
+        config_mesh['mesh_file_name']=mesh_name
         config_mesh['BC_Neumann_point_X_']=np.array([200])
         config_mesh['BC_Dirichlet_X_']=np.array([0])
         config_mesh['BC_Dirichlet_Y_']=np.array([0])
         config_mesh['BC_Dirichlet_Z_']=np.array([0])
         config_mesh['analysis_dimension']='3D'
         mesh=MeshFEM(config_mesh)
+        external_force=Inload(mesh)
         
         #Material properties 
         config_material=np.array([210E3,0.29])
         
         #Elementar stifiness 
-        self.element=[None]*mesh.n_elements
+        element=[None]*mesh.n_elements
         material=[None]*mesh.n_elements
         for i in range(mesh.n_elements):
-            self.element[i]=Hexaedron_8nodes(mesh,i)
-            material[i]=linear_elasticity_iso_3D(self.element[i],config_material)
+            element[i]=Hexaedron_8nodes(mesh,i)
+            material[i]=linear_elasticity_iso_3D(element[i],config_material)
         
         for i in range(mesh.n_elements): 
-            self.element[i].jacobian_element()    
-            self.element[i].B_element() 
+            element[i].jacobian_element()    
+            element[i].B_element() 
         
 
         for i in range(mesh.n_elements):     
-            self.element[i].get_Ke_element(material[i]) 
+            element[i].get_Ke_element(material[i]) 
         
-        #Global stifiness     
-        self.K_glob=np.zeros((mesh.n_GDL_tot,mesh.n_GDL_tot))
-        self.K_glob=KGlobal(self.K_glob,self.element,mesh,material)
-        assert np.allclose(self.K_glob,self.KG)   
-#-----------------------------------------------------------------------------# 
-        
-    def test_global_stiffness_BC_impoesd(self):
-        f='test_files'
-        self.KG_BC_imposed=np.loadtxt(os.path.join(f,'KG_BC_imposed_cube2.csv'),delimiter=',')
-        config_mesh={}
-        config_mesh['mesh_file_name']=os.path.join('test_files','cube2.inp')
-        config_mesh['BC_Neumann_point_X_']=np.array([200])
-        config_mesh['BC_Dirichlet_X_']=np.array([0])
-        config_mesh['BC_Dirichlet_Y_']=np.array([0])
-        config_mesh['BC_Dirichlet_Z_']=np.array([0])
-        config_mesh['analysis_dimension']='3D'
-        mesh=MeshFEM(config_mesh)
-        self.external_force=Inload(mesh)
-        
-        #Material properties 
-        config_material=np.array([210E3,0.29])
-        
-        #Elementar stifiness 
-        self.element=[None]*mesh.n_elements
-        material=[None]*mesh.n_elements
-        for i in range(mesh.n_elements):
-            self.element[i]=Hexaedron_8nodes(mesh,i)
-            material[i]=linear_elasticity_iso_3D(self.element[i],config_material)
-        
-        for i in range(mesh.n_elements): 
-            self.element[i].jacobian_element()    
-            self.element[i].B_element() 
-        
-
-        for i in range(mesh.n_elements):     
-            self.element[i].get_Ke_element(material[i]) 
-        
-        #Global stifiness     
-        self.K_glob=np.zeros((mesh.n_GDL_tot,mesh.n_GDL_tot))
-        self.K_glob=KGlobal(self.K_glob,self.element,mesh,material)
-        
-        self.K_glob_BC_imposed=np.zeros((mesh.n_GDL_tot,mesh.n_GDL_tot))
-        self.external_force_BC=np.zeros(mesh.n_GDL_tot)
-        
-        self.K_glob_BC_imposed[:,:]=self.K_glob
+        K_Glob=Assembly_KGlob(mesh)
+        K_Glob.KGlobal(element,mesh,material)
         #Dirichlet Boundary Condition imposition
-        self.external_force_BC[:]=self.external_force.load_vector
-        BC_imposition=Dirichlet_imposition(mesh,self.external_force.load_vector)
-        BC_imposition.dirichlet_imposition(mesh,self.K_glob_BC_imposed,
-                                                       self.external_force_BC)
-        assert np.allclose(self.K_glob_BC_imposed,self.KG_BC_imposed)
-#-----------------------------------------------------------------------------# 
-        
-    def test_external_force(self):
-        f='test_files'
-        self.load=np.loadtxt(os.path.join(f,'load_cube2.csv'),delimiter=',')
-        config_mesh={}
-        config_mesh['mesh_file_name']=os.path.join('test_files','cube2.inp')
-        config_mesh['BC_Neumann_point_X_']=np.array([200])
-        config_mesh['BC_Dirichlet_X_']=np.array([0])
-        config_mesh['BC_Dirichlet_Y_']=np.array([0])
-        config_mesh['BC_Dirichlet_Z_']=np.array([0])
-        config_mesh['analysis_dimension']='3D'
-        mesh=MeshFEM(config_mesh)
-        self.external_force=Inload(mesh)
-        
-        assert np.allclose(self.external_force.load_vector,self.load)
-#-----------------------------------------------------------------------------# 
+        Dirichlet_BC=Dirichlet_imposition(mesh)
+        Dirichlet_BC.imposing_Dirichlet_BC(K_Glob,element,mesh,external_force.load_vector)
 
+        
+        displacement=linalg.spsolve(K_Glob.KGlob_csr_BC,Dirichlet_BC.load_subtract_BC)
+        
+        return displacement
+        
+
+#-----------------------------------------------------------------------------# 
         

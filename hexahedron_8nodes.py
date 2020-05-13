@@ -264,6 +264,7 @@ class Hexaedron_8nodes:
             self.Ke+=(np.matmul(B_t,(np.matmul(material.tangent_modulus,self.B[cont:cont+6,:])))
                                      *self.det_Jacobian[i]*w_i*w_j*w_k)                      
             cont+=6
+        return self.Ke
                 
 #-----------------------------------------------------------------------------# 
                    
