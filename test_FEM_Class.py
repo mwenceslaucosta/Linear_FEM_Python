@@ -11,9 +11,7 @@ from mesh import MeshFEM
 from hexahedron_8nodes import Hexaedron_8nodes
 from inload import Inload
 from constitutive_models import linear_elasticity_iso_3D
-from dirichlet_bc_imposition import Dirichlet_imposition
-from assembly_KGlob import Assembly_KGlob
-
+from assembly_KGlob_and_BC import Assembly_KGlob_and_BC
 
 class Test_FEM_Class:
     """
@@ -127,26 +125,20 @@ class Test_FEM_Class:
         #Elementar stifiness 
         element=[None]*mesh.n_elements
         material=[None]*mesh.n_elements
+           
         for i in range(mesh.n_elements):
             element[i]=Hexaedron_8nodes(mesh,i)
-            material[i]=linear_elasticity_iso_3D(element[i],config_material)
-        
-        for i in range(mesh.n_elements): 
+            material[i]=linear_elasticity_iso_3D(element[i],config_material)        
             element[i].jacobian_element()    
             element[i].B_element() 
-        
-
-        for i in range(mesh.n_elements):     
             element[i].get_Ke_element(material[i]) 
         
-        K_Glob=Assembly_KGlob(mesh)
-        K_Glob.KGlobal(element,mesh,material)
-        #Dirichlet Boundary Condition imposition
-        Dirichlet_BC=Dirichlet_imposition(mesh)
-        Dirichlet_BC.imposing_Dirichlet_BC(K_Glob,element,mesh,external_force.load_vector)
+        #Global stifiness     
+        K_Glob=Assembly_KGlob_and_BC(mesh)
+        K_Glob.KGlobal(element,mesh,material,external_force.load_vector)
 
-        
-        displacement=linalg.spsolve(K_Glob.KGlob_csr_BC,Dirichlet_BC.load_subtract_BC)
+        #Displacement
+        displacement=linalg.spsolve(K_Glob.KGlob_csc_BC,external_force.load_vector)
         
         return displacement
         

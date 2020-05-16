@@ -16,28 +16,19 @@ class Inload:
     def __init__(self,mesh):
 
         self.load_vector=np.zeros(mesh.n_GDL_tot)
-        n_GDL_node=mesh.n_GDL_node_element
-        if hasattr(mesh,"BC_Neumann_point_X_"):
-            n_direc_GDL=0
-            self.assembly_Neumman_point(n_GDL_node,mesh.BC_Neumann_point_X_,n_direc_GDL)
-        if hasattr(mesh,"BC_Neumann_point_Y_"):
-            n_direc_GDL=1
-            self.assembly_Neumman_point(n_GDL_node,mesh.BC_Neumann_point_Y_,n_direc_GDL)
-        if hasattr(mesh,"BC_Neumann_point_Z_"):
-            n_direc_GDL=2
-            self.assembly_Neumman_point(n_GDL_node,mesh.BC_Neumann_point_Z_,n_direc_GDL)
+        self.assembly_Neumman_point(mesh)
+
 
 #-----------------------------------------------------------------------------            
-    def assembly_Neumman_point(self,n_GDL_node,List_BC_Neumann,n_direc_GDL):
+    def assembly_Neumman_point(self,mesh):
         """
         Method to assembly Neummann nodal forces
         """
-        for i in range(len(List_BC_Neumann[0])):
-            n_nodes_BC=len(List_BC_Neumann[0][i])
-            for j in range(n_nodes_BC):
-                n_GDL_global=(List_BC_Neumann[0][i][j])*n_GDL_node+n_direc_GDL
-                force_val=List_BC_Neumann[1][i]/n_nodes_BC
-                self.load_vector[n_GDL_global]+=force_val
+        cont=0
+        for i in mesh.Neumann_pt[2]:
+            self.load_vector[i]=mesh.Neumann_pt[1][cont]
+            cont+=1
+          
     
     
             
