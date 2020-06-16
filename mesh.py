@@ -74,80 +74,86 @@ class MeshFEM:
         1 - for y 
         2 - for z 
         
-        self.Neumann_pt[0]: Vector containing all nodes with nodal Neumman BC 
-        self.Neumann_pt[1]: Vector containing BC value of each DOF
-        self.Neumann_pt[2]: Vector containing nodal Neumman BC DOF.
+        self.Neumann_pt_nodes: Vector containing all nodes with nodal Neumman BC 
+        self.Neumann_pt_values: Vector containing BC value of each DOF
+        self.Neumann_pt_DOF: Vector containing nodal Neumman BC DOF.
         
-        self.Dirichlet_ind[0]: Vector containing all nodes with Dirichlet BC 
-        self.Dirichlet_ind[1]: Vector containing BC value of each DOF
-        self.Dirichlet_ind[2]: Vector containing Dirichlet BC DOF.
+        self.Dirichlet_nodes: Vector containing all nodes with Dirichlet BC 
+        self.Dirichlet_values: Vector containing BC value of each DOF
+        self.Dirichlet_DOF: Vector containing Dirichlet BC DOF.
         """
         cont=0
         #Neumann nodal
-        BC_type='Neumman_point'
-        n=self.get_number_BC_directions(config_mesh,BC_type)
-        self.Neumann_pt=[[None]*n,[None]*n,[None]*n]
-        cont_n=0
-        if 'BC_Neumann_point_X_' in config_mesh:
-            name_group='BC_Neumann_point_X_'
-            direction_BC=0 
-            self.Neumann_pt[0][cont_n],self.Neumann_pt[1][cont_n],\
-            self.Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
-            cont_n+=1
-            cont+=1
-        if 'BC_Neumann_point_Y_' in config_mesh:
-            name_group='BC_Neumann_point_Y_'
-            direction_BC=1
-            self.Neumann_pt[0][cont_n],self.Neumann_pt[1][cont_n],\
-            self.Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
-            cont_n+=1
-            cont+=1
-        if 'BC_Neumann_point_Z_' in config_mesh:
-            name_group='BC_Neumann_point_Z_'
-            direction_BC=2
-            self.Neumann_pt[0][cont_n],self.Neumann_pt[1][cont_n],\
-            self.Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
-            cont_n+=1
-            cont+=1
-            
-        self.Neumann_pt[0]=np.concatenate(self.Neumann_pt[0]) 
-        self.Neumann_pt[1]=np.concatenate(self.Neumann_pt[1])
-        self.Neumann_pt[2]=np.concatenate(self.Neumann_pt[2])
+        Neumman=['BC_Neumann_point_X_','BC_Neumann_point_Y_','BC_Neumann_point_Z_']
+        if any(s==Neumman[0] or s==Neumman[1] or s==Neumman[2] for s in config_mesh):
+            BC_type='Neumman_point'
+            n=self.get_number_BC_directions(config_mesh,BC_type)
+            Neumann_pt=[[None]*n,[None]*n,[None]*n]
+            cont_n=0
+            if 'BC_Neumann_point_X_' in config_mesh:
+                name_group='BC_Neumann_point_X_'
+                direction_BC=0 
+                Neumann_pt[0][cont_n],Neumann_pt[1][cont_n],\
+                Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                cont_n+=1
+                cont+=1
+            if 'BC_Neumann_point_Y_' in config_mesh:
+                name_group='BC_Neumann_point_Y_'
+                direction_BC=1
+                Neumann_pt[0][cont_n],Neumann_pt[1][cont_n],\
+                Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                cont_n+=1
+                cont+=1
+            if 'BC_Neumann_point_Z_' in config_mesh:
+                name_group='BC_Neumann_point_Z_'
+                direction_BC=2
+                Neumann_pt[0][cont_n],Neumann_pt[1][cont_n],\
+                Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                cont_n+=1
+                cont+=1
+                
+            self.Neumann_pt_nodes=np.concatenate(Neumann_pt[0]).reshape(-1)
+            self.Neumann_pt_values=np.concatenate(Neumann_pt[1]).reshape(-1)
+            self.Neumann_pt_DOF=np.concatenate(Neumann_pt[2]).reshape(-1)
+
         
         #Dirichlet
-        BC_type='Dirichlet_ind'
-        n=self.get_number_BC_directions(config_mesh,BC_type)
-        self.Dirichlet_ind=[[None]*n,[None]*n,[None]*n]
-        cont_n=0
-        if 'BC_Dirichlet_X_' in config_mesh:
-            name_group='BC_Dirichlet_X_'
-            direction_BC=0 
-            self.Dirichlet_ind[0][cont_n],self.Dirichlet_ind[1][cont_n],\
-            self.Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
-            cont_n+=1
-            cont+=1
-        if 'BC_Dirichlet_Y_' in config_mesh:
-            name_group='BC_Dirichlet_Y_'
-            direction_BC=1
-            self.Dirichlet_ind[0][cont_n],self.Dirichlet_ind[1][cont_n],\
-            self.Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
-            cont_n+=1
-            cont+=1
-        if 'BC_Dirichlet_Z_' in config_mesh:
-            name_group='BC_Dirichlet_Z_'
-            direction_BC=2
-            self.Dirichlet_ind[0][cont_n],self.Dirichlet_ind[1][cont_n],\
-            self.Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
-            cont_n+=1
-            cont+=1        
-        
-        self.Dirichlet_ind[0]=np.concatenate(self.Dirichlet_ind[0]) 
-        self.Dirichlet_ind[1]=np.concatenate(self.Dirichlet_ind[1])
-        self.Dirichlet_ind[2]=np.concatenate(self.Dirichlet_ind[2])            
-        
-        if cont==0:
-            sys.exit('Fatal error: No were informed the Boundary Conditions or\
-                     the names not check')
+        Dirichlet=['BC_Dirichlet_X_','BC_Dirichlet_Y_','BC_Dirichlet_Z_']
+        if any(s==Dirichlet[0] or s==Dirichlet[1] or s==Dirichlet[2] for s in config_mesh):
+            BC_type='Dirichlet_ind'
+            n=self.get_number_BC_directions(config_mesh,BC_type)
+            Dirichlet_ind=[[None]*n,[None]*n,[None]*n]
+            cont_n=0
+            if 'BC_Dirichlet_X_' in config_mesh:
+                name_group='BC_Dirichlet_X_'
+                direction_BC=0 
+                Dirichlet_ind[0][cont_n],Dirichlet_ind[1][cont_n],\
+                Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                cont_n+=1
+                cont+=1
+            if 'BC_Dirichlet_Y_' in config_mesh:
+                name_group='BC_Dirichlet_Y_'
+                direction_BC=1
+                Dirichlet_ind[0][cont_n],Dirichlet_ind[1][cont_n],\
+                Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                cont_n+=1
+                cont+=1
+            if 'BC_Dirichlet_Z_' in config_mesh:
+                name_group='BC_Dirichlet_Z_'
+                direction_BC=2
+                Dirichlet_ind[0][cont_n],Dirichlet_ind[1][cont_n],\
+                Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                cont_n+=1
+                cont+=1        
+            
+            self.Dirichlet_nodes=np.concatenate(Dirichlet_ind[0]).reshape(-1) 
+            self.Dirichlet_values=np.concatenate(Dirichlet_ind[1]).reshape(-1)
+            self.Dirichlet_DOF=np.concatenate(Dirichlet_ind[2]).reshape(-1)
+            self.Dirichlet_DOF_sorted=np.sort(self.Dirichlet_DOF)
+        else:
+            sys.exit('Fatal error: No were informed the Dirichlet Boundary\
+                     conditions or the names not check')
+
         #Saving number of BC groups
         self.n_BC=cont
 
@@ -205,23 +211,23 @@ class MeshFEM:
                      name does not confer '
                 sys.exit(msg)  
             #Storing nodes of the group
-            BC_nodes[cont]=read_mesh.point_sets[name_BC]
+            BC_nodes[0][cont]=read_mesh.point_sets[name_BC]
             
             #BC group values
-            number_of_nodes_group=BC_nodes[cont].shape[0]
+            number_of_nodes_group=BC_nodes[0][cont].shape[0]
             
             if BC_type=='Neumman_point':
                 value=config_mesh[name_group][cont]/number_of_nodes_group
-                BC_values[cont]=np.ones(number_of_nodes_group)*value
+                BC_values[0][cont]=np.ones(number_of_nodes_group)*value
             else:
-                BC_values[cont]=np.ones(number_of_nodes_group)*config_mesh[name_group][cont]
+                BC_values[0][cont]=np.ones(number_of_nodes_group)*config_mesh[name_group][cont]
             
             #Storing degrees of freedom of the group
-            BC_DOF[cont]=np.zeros(number_of_nodes_group,dtype=int)
+            BC_DOF[0][cont]=np.zeros(number_of_nodes_group,dtype=int)
             cont2=0
             for i in read_mesh.point_sets[name_BC]:
-                GDL=i*self.n_GDL_node_element+direction_BC
-                BC_DOF[cont][cont2]=GDL
+                DOF=i*self.DOF_node_elem+direction_BC
+                BC_DOF[0][cont][cont2]=DOF
                 cont2+=1
                 
             if (name_group+str(cont+1)) in read_mesh.point_sets:
@@ -230,9 +236,9 @@ class MeshFEM:
             else:
                 flag=-1
                 
-        BC_nodes=np.concatenate(BC_nodes)
-        BC_values=np.concatenate(BC_values)
-        BC_DOF=np.concatenate(BC_DOF)
+        BC_nodes=np.concatenate(BC_nodes).reshape(-1)
+        BC_values=np.concatenate(BC_values).reshape(-1)
+        BC_DOF=np.concatenate(BC_DOF).reshape(-1)
        
         n_BC=cont+1;
         if n_values != n_BC:
@@ -265,15 +271,16 @@ class MeshFEM:
                    
                 self.connectivity=read_mesh.cells_dict['hexahedron']
                 cont=len(read_mesh.cells_dict['hexahedron'])  
-                self.n_nodes_element=8
-                self.n_GDL_node_element=3
-                self.n_GDL_el=self.n_nodes_element*self.n_GDL_node_element
+                self.n_nodes_elem=8
+                self.DOF_node_elem=3
+                self.n_Gauss_elem=8
+                self.n_DOF_elem=self.n_nodes_elem*self.DOF_node_elem
             if "tetra" in read_mesh.cells_dict:
                 sys.exit('Tetrahedral element not implemented.')
                 self.connectivity=read_mesh.cells_dict['tetra']
                 cont=len(read_mesh.cells_dict['tetra'])
-                self.n_nodes_element=4
-                self.n_GDL_node_element=3
+                self.n_nodes_elem=4
+                self.DOF_node_elem=3
 
         elif self.analysis_dimension=='2D_plane_stress':
             sys.exit('Type of analysis not implemented')
@@ -283,11 +290,11 @@ class MeshFEM:
                     
                 self.connectivity=read_mesh.cells_dict['quad']
                 cont=len(read_mesh.cells_dict['quad'])
-                self.n_nodes_element=4
-                self.n_GDL_node_element=2
+                self.n_nodes_elem=4
+                self.DOF_node_elem=2
         
-        self.n_elements=cont
-        self.n_GDL_tot=self.n_nodes_glob*self.n_GDL_node_element
+        self.n_elem=cont
+        self.DOF_tot=self.n_nodes_glob*self.DOF_node_elem
         
 #-----------------------------------------------------------------------------                    
 

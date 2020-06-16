@@ -15,8 +15,9 @@ class Inload:
 #-----------------------------------------------------------------------------            
     def __init__(self,mesh):
 
-        self.load_vector=np.zeros(mesh.n_GDL_tot)
-        self.assembly_Neumman_point(mesh)
+        self.load_vector=np.zeros(mesh.DOF_tot)
+        if hasattr(mesh,'Neumann_pt_values'):
+            self.assembly_Neumman_point(mesh)
 
 
 #-----------------------------------------------------------------------------            
@@ -25,8 +26,8 @@ class Inload:
         Method to assembly Neummann nodal forces
         """
         cont=0
-        for i in mesh.Neumann_pt[2]:
-            self.load_vector[i]=mesh.Neumann_pt[1][cont]
+        for i in mesh.Neumann_pt_DOF:
+            self.load_vector[i]=mesh.Neumann_pt_values[cont]
             cont+=1
           
     
