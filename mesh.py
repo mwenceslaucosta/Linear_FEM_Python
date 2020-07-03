@@ -413,13 +413,10 @@ class MeshFEM:
                 self.n_Gauss_elem=8
                 self.DOF_stress_strain=6
                 self.n_DOF_elem=self.n_nodes_elem*self.DOF_node_elem
-                if self.mesh_type=='Salome':
-                    import hexaedron_8nodes 
-                    self.fun_elem=hexaedron_8nodes 
-                elif self.mesh_type=='Abaqus':
-                    import hexaedron_8nodes_inp_format 
-                    self.fun_elem=hexaedron_8nodes_inp_format
-                    
+
+                import hexaedron_8nodes 
+                self.fun_elem=hexaedron_8nodes 
+                   
             if "tetra" in read_mesh.cells_dict:
                 sys.exit('Tetrahedral element not implemented.')
                 self.connectivity=read_mesh.cells_dict['tetra']

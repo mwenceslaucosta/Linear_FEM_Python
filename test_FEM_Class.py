@@ -24,7 +24,8 @@ class Test_FEM_Class:
         f='test_files'
         displacement_cube2=np.loadtxt(os.path.join(f,'displacement_cube2.csv'),delimiter=',')
         mesh_name=os.path.join('test_files','cube2.inp')
-        displacement_computed=self.get_displacement(mesh_name)
+        out_file_name='FEM_out_test_cube_2'
+        displacement_computed=self.get_displacement(mesh_name,out_file_name)
         
         assert np.allclose(displacement_computed,displacement_cube2)
 
@@ -34,13 +35,14 @@ class Test_FEM_Class:
         f='test_files'
         displacement_cube1000=np.loadtxt(os.path.join(f,'displacement_cube1000.csv'),delimiter=',')
         mesh_name=os.path.join('test_files','cube1000.inp')
-        displacement_computed=self.get_displacement(mesh_name)
+        out_file_name='FEM_out_test_cube_1000'
+        displacement_computed=self.get_displacement(mesh_name,out_file_name)
         
         assert np.allclose(displacement_computed,displacement_cube1000)
 
 #-----------------------------------------------------------------------------# 
         
-    def get_displacement(self,mesh_name):
+    def get_displacement(self,mesh_name,out_file_name):
         #Config Material model  
         mat_prop=np.array([210E3,0.29])
         material_model=linear_elasticity_iso_3D
@@ -56,8 +58,9 @@ class Test_FEM_Class:
         mesh=MeshFEM(config_mesh)
         
         #Solver and Poss-processing
-        displacement,stress,strain=static_linear(mesh,material_model,mat_prop)
-        
+   
+        displacement,stress_gauss,strain_gauss,stress_nodes,strain_nodes=static_linear(
+                                  mesh,material_model,mat_prop,out_file_name)
         return displacement
         
 

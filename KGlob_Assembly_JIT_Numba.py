@@ -15,7 +15,7 @@ def KGlobal(n_elem,n_nodes_element,DOF,cont,Dirichlet_DOF,Dirichlet_values,
             force_vector,connectivity,load_subtraction,coo_i,coo_j,coo_data,
             coo_data_BC,gauss_coord,gauss_weight,elem_coord,
             jacobian,det_Jacobian,deri_phi_param,deri_phi_real,B_elem,B_t,
-            B_Gauss,K_e,nodes,tang_modu,B_all_elem):
+            B_Gauss,K_e,nodes,tang_modu,B_all_elem,mesh_type):
     """
     Function to assembly global stifiness matrix.  
     
@@ -28,7 +28,7 @@ def KGlobal(n_elem,n_nodes_element,DOF,cont,Dirichlet_DOF,Dirichlet_values,
         K_e,B_e=B_and_Ke_elem(gauss_coord,
                             gauss_weight,elem_coord,connectivity[M,:],
                             jacobian,det_Jacobian,deri_phi_param,deri_phi_real,
-                            B_elem,B_t,B_Gauss,K_e,nodes,tang_modu) 
+                            B_elem,B_t,B_Gauss,K_e,nodes,tang_modu,mesh_type) 
         B_all_elem[M*48:(M*48+48),:]=B_e[:,:]
            
         for i in range(n_nodes_element):

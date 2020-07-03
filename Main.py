@@ -8,12 +8,12 @@ import numpy as np
 from mesh import MeshFEM 
 import linear_elasticity_iso_3D 
 from solvers import static_linear
-
+ 
 
 #Config Mesh
 config_mesh={}
-config_mesh['mesh_file_name']='cube1000.inp' #'test_mesh_linux.med'
-config_mesh['BC_Neumann_point_X_']=np.array([200])
+config_mesh['mesh_file_name']='plate_with_hole.med' #'test_mesh_linux.med'
+config_mesh['BC_Neumann_point_X_']=np.array([1500])
 config_mesh['BC_Dirichlet_X_']=np.array([0])
 config_mesh['BC_Dirichlet_Y_']=np.array([0])
 config_mesh['BC_Dirichlet_Z_']=np.array([0])

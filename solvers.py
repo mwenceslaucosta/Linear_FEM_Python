@@ -43,7 +43,8 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
                       Vars.elem_coor,Vars.jacobian,
                       Vars.det_Jacobian,Vars.deri_phi_param,
                       Vars.deri_phi_real,Vars.B_elem,Vars.B_t,
-                      Vars.B_Gauss,Vars.Ke,mesh.nodes,tang_modu,Vars.B_all_elem) 
+                      Vars.B_Gauss,Vars.Ke,mesh.nodes,tang_modu,
+                      Vars.B_all_elem,mesh.mesh_type) 
     
     #Global Sparse Matrix
     coo_Kglob=coo_matrix((Vars.coo_data,(Vars.coo_i,Vars.coo_j)),shape=(mesh.DOF_tot,mesh.DOF_tot))
@@ -58,7 +59,7 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
     displacement=linalg.spsolve(KGlob_csc_BC,load_subtraction)
     
     #Pos-processing 
-    extrapol_matrix=mesh.fun_elem.get_extrapolate_matrix(Vars.N,Vars.phi_vec,Vars.gauss_coor)
+    extrapol_matrix=mesh.fun_elem.get_extrapolate_matrix(Vars.N,Vars.phi_vec,Vars.gauss_coor,mesh.mesh_type)
     
     stress_gauss,strain_gauss,stress_nodes,strain_nodes=pos_processing.pos_static_linear(
                 Vars.B_all_elem,tang_modu,Vars.stress_gauss,Vars.strain_gauss,
