@@ -42,6 +42,8 @@ class Init_Vars:
         self.B_t=np.zeros((mesh.n_nodes_elem*mesh.DOF_node_elem,n_Voight))
         self.Ke=np.zeros((mesh.n_DOF_elem,mesh.n_DOF_elem))
         self.B_Gauss=np.zeros((n_Voight,mesh.n_DOF_elem)) 
+        self.N=np.zeros((mesh.n_nodes_elem,mesh.n_nodes_elem))
+        self.phi_vec=N=np.zeros(mesh.n_nodes_elem)
         # Initializing non-linear constitutive model arrays
         # To do 
         if mat_model.__name__ == 'plastic_Mises3D':
@@ -51,12 +53,17 @@ class Init_Vars:
             self.tang_modu=np.zeros((6,6))
                         
         elif mat_model.__name__== 'linear_elasticity_iso_3D':
-            self.stress=np.zeros((6*mesh.n_Gauss_elem*2,mesh.n_elem))
-            self.strain=np.zeros((6*mesh.n_Gauss_elem*2,mesh.n_elem))
+            self.stress_gauss=np.zeros((mesh.n_elem,6*mesh.n_Gauss_elem))
+            self.strain_gauss=np.zeros((mesh.n_elem,6*mesh.n_Gauss_elem))
+            self.stress_nodes=np.zeros((mesh.n_nodes_glob,6)) 
+            self.strain_nodes=np.zeros((mesh.n_nodes_glob,6)) 
+            self.cont_average=np.zeros(mesh.n_nodes_glob)
+            self.extrapol_vec_strain=np.zeros(mesh.n_nodes_elem)
+            self.extrapol_vec_stress=np.zeros(mesh.n_nodes_elem)
             #self.inter_var=np.zeros((12*mesh.n_Gauss_elem,mesh.n_elem))
             self.tang_modu=np.zeros((6,6))
-         
-        self.u_glob=np.zeros(mesh.DOF_tot)
+
+        self.u_glob=np.zeros((6*mesh.n_Gauss_elem*2,mesh.n_elem))
         self.u_elem=np.zeros(mesh.DOF_node_elem*mesh.n_nodes_elem)
             
         

@@ -5,19 +5,21 @@ Created on Mon Apr 27 16:55:50 2020
 @author: Matheus_Wenceslau
 """
 import numpy as np
+import os
 import meshio 
 import sys 
 
 class MeshFEM:
     """
-    Class to import mesh in .inp format (Abaqus) from GMSH
-    Element implemented: C3D8-Hexahedron 
+    Class to import mesh in .med fromSalome and .inp format (Abaqus) from GMSH
+    Elements: C3D8-Hexahedron 
+              Quad4 (To Finish)
     Only one type of element per analysis. 
     Parameters: 
     config_mesh: Dictionary to read and config mesh
     1- config_mesh['mesh_file_name']: Name of the mesh file in in .inp format 
     2-config_mesh['analysis_dimension']: 
-        analysis_dimension=3D (Only implemented for now)
+        analysis_dimension=3D 
               or 
        analysis_dimension=2D_plane_stress
        
@@ -52,20 +54,154 @@ class MeshFEM:
 #-----------------------------------------------------------------------------    
     def __init__(self,config_mesh):
         """
-        Constructor meshFEM class
+        Constructor meshFEM class 
         """
-        self.mesh_file=config_mesh['mesh_file_name']
-        read_mesh=meshio.read(self.mesh_file)
+        self.mesh_file=os.path.join(config_mesh['mesh_file_name'])
+        self.meshio_=meshio.read(self.mesh_file)    
         self.analysis_dimension=config_mesh['analysis_dimension']        
-        self.nodes=read_mesh.points
+        self.nodes=self.meshio_.points
         self.n_nodes_glob=self.nodes.shape[0]
- #       self.lines=read_mesh.cells_dict['line']
-        self.get_connectivity(read_mesh)
-        self.get_BC(read_mesh,config_mesh)
+ #      self.lines=read_mesh.cells_dict['line']
+        
+        if config_mesh['mesh_file_name'].endswith('.inp'):
+            #Abaqus Format - .inp
+            self.mesh_type='Abaqus'
+        elif config_mesh['mesh_file_name'].endswith('.med'):
+            #Salome Format - .med 
+            self.mesh_type='Salome'
+        else:
+            sys.exit('Fatal error: Mesh format no accepted')
+        
+        self.get_connectivity(self.meshio_)
+
+        #Boundary Conditions 
+        if config_mesh['mesh_file_name'].endswith('.inp'):
+            #Abaqus Format - .inp
+            self.get_BC_inp(self.meshio_,config_mesh)
+        elif config_mesh['mesh_file_name'].endswith('.med'):
+            #Salome Format - .med 
+            self.get_BC_med(config_mesh)
+        
+
       
-#-----------------------------------------------------------------------------    
+#-----------------------------------------------------------------------------
+            
+    def get_BC_med (self,config_mesh):
+        """
+        Method to get the list of nodes and values of the Boundary Conditions(BC)
+        in .med (salome) format
+        
+        direction_BC - Direction of the BC
+        0 - for x 
+        1 - for y 
+        2 - for z 
+        
+        self.Neumann_pt_nodes: Vector containing all nodes with nodal Neumman BC 
+        self.Neumann_pt_values: Vector containing BC value of each DOF
+        self.Neumann_pt_DOF: Vector containing nodal Neumman BC DOF.
+        
+        self.Dirichlet_nodes: Vector containing all nodes with Dirichlet BC 
+        self.Dirichlet_values: Vector containing BC value of each DOF
+        self.Dirichlet_DOF: Vector containing Dirichlet BC DOF.
+        """
+        BC_index_array=(np.argwhere(self.meshio_.point_data['point_tags']>1)).reshape(-1)
+        self.Neumann_pt_nodes=[]
+        self.Neumann_pt_values=[]
+        self.Neumann_pt_DOF=[]
+        self.Dirichlet_nodes=[]
+        self.Dirichlet_values=[]
+        self.Dirichlet_DOF=[]
+        for index_BC in BC_index_array:
+            node=index_BC
+            BC_key=self.meshio_.point_data['point_tags'][index_BC]
+            for ii in self.meshio_.point_tags[BC_key]:
+                if ii != 'Group_Of_All_Nodes':
+                    self.BC_med(config_mesh,ii,node,BC_key)
+        self.Neumann_pt_nodes=np.asarray(self.Neumann_pt_nodes)
+        self.Neumann_pt_values=np.asarray(self.Neumann_pt_values)
+        self.Neumann_pt_DOF=np.asarray(self.Neumann_pt_DOF)
+        self.Dirichlet_nodes=np.asarray(self.Dirichlet_nodes)
+        self.Dirichlet_values=np.asarray(self.Dirichlet_values)
+        self.Dirichlet_DOF=(np.asarray(self.Dirichlet_DOF)).reshape(-1)
+        self.Dirichlet_DOF_sorted=np.sort(self.Dirichlet_DOF)
+
+            
+#-----------------------------------------------------------------------------
+    def BC_med(self,config_mesh,name_BC,node,BC_key):
+        """
+        Method to call routine list_BC_med in .med format (salome)
+        
+        direction_BC - Direction of the BC
+        0 - for x 
+        1 - for y 
+        2 - for z 
+        """
+        
+        suffix=int(name_BC[-1])
+        
+        if name_BC.startswith('BC_Neumann_point_X_'):
+            name_prefix='BC_Neumann_point_X_'
+            direction_BC=0
+            self.list_BC_med(config_mesh,name_prefix,suffix,direction_BC,node,BC_key)
+        elif name_BC.startswith('BC_Neumann_point_Y_'):
+            name_prefix='BC_Neumann_point_Y_'
+            direction_BC=1
+            self.list_BC_med(config_mesh,name_prefix,suffix,direction_BC,node,BC_key)
+        elif name_BC.startswith('BC_Neumann_point_Z_'):
+            name_prefix='BC_Neumann_point_Z_'
+            direction_BC=2
+            self.list_BC_med(config_mesh,name_prefix,suffix,direction_BC,node,BC_key)
+        
+        elif name_BC.startswith('BC_Dirichlet_X_'):
+            name_prefix='BC_Dirichlet_X_'
+            direction_BC=0
+            self.list_BC_med(config_mesh,name_prefix,suffix,direction_BC,node,BC_key)
+        elif name_BC.startswith('BC_Dirichlet_Y_'):
+            name_prefix='BC_Dirichlet_Y_'
+            direction_BC=1
+            self.list_BC_med(config_mesh,name_prefix,suffix,direction_BC,node,BC_key)
+        elif name_BC.startswith('BC_Dirichlet_Z_'):
+            name_prefix='BC_Dirichlet_Z_'
+            direction_BC=2
+            self.list_BC_med(config_mesh,name_prefix,suffix,direction_BC,node,BC_key)
+        else: 
+            msg='Falal error: '+name_BC+' is not defined in mesh file or\
+                     name does not confer '
+            sys.exit(msg)
+            
+#-----------------------------------------------------------------------------
+    def list_BC_med(self,config_mesh,name_prefix,suffix,direction_BC,node,BC_key):
+        """ 
+        Method to create a list cointaning the nodal vector of BC and it's value in 
+        .med (Salome) format.
+                 
+        """
+        
+        name_group=name_prefix+str(suffix)
+        if len(config_mesh[name_prefix]) != suffix+1:
+            msg1=('Fatal error: '+'error in '+name_group)
+            msg2=('. Number of numeric values in config_mesh['+name_group)
+            msg3= ('] do not coincide with the BC. Check the number of\
+                          groups and the number of numerical values entered.')
+            msg=msg1+msg2+msg3
+            sys.exit(msg)
+            
+        DOF=self.DOF_node_elem*node+direction_BC
+        if name_prefix.startswith('BC_Neumann'):
+            unique,counts=np.unique(self.meshio_.point_data['point_tags'],return_counts=True) 
+            number_of_nodes_group=counts[BC_key-1]
+            self.Neumann_pt_nodes.append(node)
+            self.Neumann_pt_values.append(config_mesh[name_prefix][suffix]/number_of_nodes_group) 
+            self.Neumann_pt_DOF.append(DOF)
+        elif name_prefix.startswith('BC_Dirichlet'):
+            self.Dirichlet_nodes.append(node)
+            self.Dirichlet_values.append(config_mesh[name_prefix][suffix]) 
+            self.Dirichlet_DOF.append(DOF)
+        
+        
+ #-----------------------------------------------------------------------------                                                  
                            
-    def get_BC(self,read_mesh,config_mesh):
+    def get_BC_inp(self,read_mesh,config_mesh):
         """
         Method to get the list of nodes and values of the Boundary Conditions(BC)
         
@@ -94,21 +230,21 @@ class MeshFEM:
                 name_group='BC_Neumann_point_X_'
                 direction_BC=0 
                 Neumann_pt[0][cont_n],Neumann_pt[1][cont_n],\
-                Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                Neumann_pt[2][cont_n]=self.list_BC_inp(read_mesh,name_group,config_mesh,direction_BC,BC_type)
                 cont_n+=1
                 cont+=1
             if 'BC_Neumann_point_Y_' in config_mesh:
                 name_group='BC_Neumann_point_Y_'
                 direction_BC=1
                 Neumann_pt[0][cont_n],Neumann_pt[1][cont_n],\
-                Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                Neumann_pt[2][cont_n]=self.list_BC_inp(read_mesh,name_group,config_mesh,direction_BC,BC_type)
                 cont_n+=1
                 cont+=1
             if 'BC_Neumann_point_Z_' in config_mesh:
                 name_group='BC_Neumann_point_Z_'
                 direction_BC=2
                 Neumann_pt[0][cont_n],Neumann_pt[1][cont_n],\
-                Neumann_pt[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                Neumann_pt[2][cont_n]=self.list_BC_inp(read_mesh,name_group,config_mesh,direction_BC,BC_type)
                 cont_n+=1
                 cont+=1
                 
@@ -128,21 +264,21 @@ class MeshFEM:
                 name_group='BC_Dirichlet_X_'
                 direction_BC=0 
                 Dirichlet_ind[0][cont_n],Dirichlet_ind[1][cont_n],\
-                Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                Dirichlet_ind[2][cont_n]=self.list_BC_inp(read_mesh,name_group,config_mesh,direction_BC,BC_type)
                 cont_n+=1
                 cont+=1
             if 'BC_Dirichlet_Y_' in config_mesh:
                 name_group='BC_Dirichlet_Y_'
                 direction_BC=1
                 Dirichlet_ind[0][cont_n],Dirichlet_ind[1][cont_n],\
-                Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                Dirichlet_ind[2][cont_n]=self.list_BC_inp(read_mesh,name_group,config_mesh,direction_BC,BC_type)
                 cont_n+=1
                 cont+=1
             if 'BC_Dirichlet_Z_' in config_mesh:
                 name_group='BC_Dirichlet_Z_'
                 direction_BC=2
                 Dirichlet_ind[0][cont_n],Dirichlet_ind[1][cont_n],\
-                Dirichlet_ind[2][cont_n]=self.list_BC(read_mesh,name_group,config_mesh,direction_BC,BC_type)
+                Dirichlet_ind[2][cont_n]=self.list_BC_inp(read_mesh,name_group,config_mesh,direction_BC,BC_type)
                 cont_n+=1
                 cont+=1        
             
@@ -174,9 +310,10 @@ class MeshFEM:
         return n_directions
             
     
-    def list_BC(self,read_mesh,name_group,config_mesh,direction_BC,BC_type):
+    def list_BC_inp(self,read_mesh,name_group,config_mesh,direction_BC,BC_type):
         """ 
-        Creates a list cointaning the nodal vector of BC and it's value.
+        Creates a list cointaning the nodal vector of BC and it's value for 
+        abaqus format.
         
         The first position of the list are the are the nodes of each group
         The second position of the list are the values of each group.
@@ -274,7 +411,15 @@ class MeshFEM:
                 self.n_nodes_elem=8
                 self.DOF_node_elem=3
                 self.n_Gauss_elem=8
+                self.DOF_stress_strain=6
                 self.n_DOF_elem=self.n_nodes_elem*self.DOF_node_elem
+                if self.mesh_type=='Salome':
+                    import hexaedron_8nodes 
+                    self.fun_elem=hexaedron_8nodes 
+                elif self.mesh_type=='Abaqus':
+                    import hexaedron_8nodes_inp_format 
+                    self.fun_elem=hexaedron_8nodes_inp_format
+                    
             if "tetra" in read_mesh.cells_dict:
                 sys.exit('Tetrahedral element not implemented.')
                 self.connectivity=read_mesh.cells_dict['tetra']
@@ -282,8 +427,7 @@ class MeshFEM:
                 self.n_nodes_elem=4
                 self.DOF_node_elem=3
 
-        elif self.analysis_dimension=='2D_plane_stress':
-            sys.exit('Type of analysis not implemented')
+        elif self.analysis_dimension=='2D_plane_stress':          
             if "quad" in read_mesh.cells_dict: 
                 if "triangle" in read_mesh.cells_dict:
                     sys.exit('Code supports only one element type per mesh.')
@@ -292,7 +436,19 @@ class MeshFEM:
                 cont=len(read_mesh.cells_dict['quad'])
                 self.n_nodes_elem=4
                 self.DOF_node_elem=2
-        
+                self.n_Gauss_elem=4
+                self.DOF_stress_strain=3
+                self.n_DOF_elem=self.n_nodes_elem*self.DOF_node_elem
+                import quad_4nodes
+                self.fun_elem=quad_4nodes
+
+            if "triangle" in read_mesh.cells_dict:
+                sys.exit('Triangle element not implemented.')
+                self.connectivity=read_mesh.cells_dict['triangle']
+                cont=len(read_mesh.cells_dict['triangle'])
+                self.n_nodes_elem=3
+
+     
         self.n_elem=cont
         self.DOF_tot=self.n_nodes_glob*self.DOF_node_elem
         

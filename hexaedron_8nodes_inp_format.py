@@ -70,100 +70,99 @@ def Interpol_fun_derivative(gauss_coord,elem_coord,jacobian,n_gauss,deri_phi_par
         t=gauss_coord[n_g,2]
 
         
-        dp_rf2_r=(1-s)*(1-t) #-2,+3
-        dp_rf6_r=(1+s)*(1-t) #-6,+7
-        dp_rf1_r=(1-s)*(1+t)  #-1,+4
-        dp_rf5_r=(1+s)*(1+t) #-5,+8
+        dp_rf1_r=(1-s)*(1-t) 
+        dp_rf3_r=(1+s)*(1-t) 
+        dp_rf5_r=(1-s)*(1+t)
+        dp_rf7_r=(1+s)*(1+t)
    
-        dp_rf2_s=(1-r)*(1-t) #-2,+6
-        dp_rf3_s=(1+r)*(1-t) #-3,+7
-        dp_rf1_s=(1-r)*(1+t) #-1,+5
-        dp_rf4_s=(1+r)*(1+t) #-4,+8
+        dp_rf1_s=(1-r)*(1-t)
+        dp_rf3_s=(1+r)*(1-t)
+        dp_rf5_s=(1-r)*(1+t)
+        dp_rf7_s=(1+r)*(1+t)
    
-        dp_rf1_t=(1-r)*(1-s) #+1,-2
-        dp_rf3_t=(1+r)*(1-s) #-3,+4
-        dp_rf5_t=(1-r)*(1+s) #5,-6
-        dp_rf7_t=(1+r)*(1+s) #-7,+8
-  
+        dp_rf1_t=(1-r)*(1-s)
+        dp_rf2_t=(1+r)*(1-s)
+        dp_rf3_t=(1+r)*(1+s)
+        dp_rf4_t=(1-r)*(1+s)
         
         
         #dx_dr
-        jacobian[0,0]=(1/8)*((-cd_no2[0]+cd_no3[0])*dp_rf2_r  
-                    +(-cd_no6[0]+cd_no7[0])*dp_rf6_r
-                    +(-cd_no1[0]+cd_no4[0])*dp_rf1_r  
-                    +(-cd_no5[0]+cd_no8[0])*dp_rf5_r)       
+        jacobian[0,0]=(1/8)*((-cd_no1[0]+cd_no2[0])*dp_rf1_r  
+                    +(cd_no3[0]-cd_no4[0])*dp_rf3_r
+                    +(-cd_no5[0]+cd_no6[0])*dp_rf5_r  
+                    +(cd_no7[0]-cd_no8[0])*dp_rf7_r)       
         
         #dx_ds
-        jacobian[1,0]=(1/8)*((-cd_no2[0]+cd_no6[0])*dp_rf2_s 
-                    + (-cd_no3[0]+cd_no7[0])*dp_rf3_s
-                   +(-cd_no1[0]+cd_no5[0])*dp_rf1_s  
-                   +(-cd_no4[0]+cd_no8[0])*dp_rf4_s)
+        jacobian[1,0]=(1/8)*((-cd_no1[0]+cd_no4[0])*dp_rf1_s 
+                    + (-cd_no2[0]+cd_no3[0])*dp_rf3_s
+                   +(-cd_no5[0]+cd_no8[0])*dp_rf5_s  
+                   +(-cd_no6[0]+cd_no7[0])*dp_rf7_s)
         #dx_dt
-        jacobian[2,0]=(1/8)*((+cd_no1[0]-cd_no2[0])*dp_rf1_t 
-                            + (-cd_no3[0]+cd_no4[0])*dp_rf3_t
-                           + (+cd_no5[0]-cd_no6[0])*dp_rf5_t 
-                           + (-cd_no7[0]+cd_no8[0])*dp_rf7_t)
+        jacobian[2,0]=(1/8)*((-cd_no1[0]+cd_no5[0])*dp_rf1_t 
+                            + (-cd_no2[0]+cd_no6[0])*dp_rf2_t
+                           + (-cd_no3[0]+cd_no7[0])*dp_rf3_t 
+                           + (-cd_no4[0]+cd_no8[0])*dp_rf4_t)
         #dy_dr
-        jacobian[0,1]=(1/8)*((-cd_no2[1]+cd_no3[1])*dp_rf2_r  
-                    +(-cd_no6[1]+cd_no7[1])*dp_rf6_r
-                    +(-cd_no1[1]+cd_no4[1])*dp_rf1_r  
-                    +(-cd_no5[1]+cd_no8[1])*dp_rf5_r)
+        jacobian[0,1]=(1/8)*((-cd_no1[1]+cd_no2[1])*dp_rf1_r  
+                    + (cd_no3[1]-cd_no4[1])*dp_rf3_r
+                   +(-cd_no5[1]+cd_no6[1])*dp_rf5_r 
+                   + (cd_no7[1]-cd_no8[1])*dp_rf7_r)
         #dy_ds
-        jacobian[1,1]=(1/8)*((-cd_no2[1]+cd_no6[1])*dp_rf2_s 
-                    + (-cd_no3[1]+cd_no7[1])*dp_rf3_s
-                   +(-cd_no1[1]+cd_no5[1])*dp_rf1_s  
-                   +(-cd_no4[1]+cd_no8[1])*dp_rf4_s)
+        jacobian[1,1]=(1/8)*((-cd_no1[1]+cd_no4[1])*dp_rf1_s 
+                             + (-cd_no2[1]+cd_no3[1])*dp_rf3_s
+                   +(-cd_no5[1]+cd_no8[1])*dp_rf5_s 
+                   + (-cd_no6[1]+cd_no7[1])*dp_rf7_s)
         #dy_dt       
-        jacobian[2,1]=(1/8)*((+cd_no1[1]-cd_no2[1])*dp_rf1_t 
-                            + (-cd_no3[1]+cd_no4[1])*dp_rf3_t
-                           + (+cd_no5[1]-cd_no6[1])*dp_rf5_t 
-                           + (-cd_no7[1]+cd_no8[1])*dp_rf7_t)
+        jacobian[2,1]=(1/8)*((-cd_no1[1]+cd_no5[1])*dp_rf1_t
+                             + (-cd_no2[1]+cd_no6[1])*dp_rf2_t
+                   + (-cd_no3[1]+cd_no7[1])*dp_rf3_t 
+                   + (-cd_no4[1]+cd_no8[1])*dp_rf4_t)
         #dz_dr       
-        jacobian[0,2]=(1/8)*((-cd_no2[2]+cd_no3[2])*dp_rf2_r  
-                    +(-cd_no6[2]+cd_no7[2])*dp_rf6_r
-                    +(-cd_no1[2]+cd_no4[2])*dp_rf1_r  
-                    +(-cd_no5[2]+cd_no8[2])*dp_rf5_r)
+        jacobian[0,2]=(1/8)*((-cd_no1[2]+cd_no2[2])*dp_rf1_r 
+                             + (cd_no3[2]-cd_no4[2])*dp_rf3_r
+                  +(-cd_no5[2]+cd_no6[2])*dp_rf5_r
+                  + (cd_no7[2]-cd_no8[2])*dp_rf7_r)
         #dz_ds
-        jacobian[1,2]=(1/8)*((-cd_no2[2]+cd_no6[2])*dp_rf2_s 
-                    + (-cd_no3[2]+cd_no7[2])*dp_rf3_s
-                   +(-cd_no1[2]+cd_no5[2])*dp_rf1_s  
-                   +(-cd_no4[2]+cd_no8[2])*dp_rf4_s)
+        jacobian[1,2]=(1/8)*((-cd_no1[2]+cd_no4[2])*dp_rf1_s 
+                             + (-cd_no2[2]+cd_no3[2])*dp_rf3_s
+                   +(-cd_no5[2]+cd_no8[2])*dp_rf5_s 
+                   + (-cd_no6[2]+cd_no7[2])*dp_rf7_s)
         #dz_dt      
-        jacobian[2,2]=(1/8)*((+cd_no1[2]-cd_no2[2])*dp_rf1_t 
-                            + (-cd_no3[2]+cd_no4[2])*dp_rf3_t
-                           + (+cd_no5[2]-cd_no6[2])*dp_rf5_t 
-                           + (-cd_no7[2]+cd_no8[2])*dp_rf7_t)
+        jacobian[2,2]=(1/8)*((-cd_no1[2]+cd_no5[2])*dp_rf1_t
+                             + (-cd_no2[2]+cd_no6[2])*dp_rf2_t
+                   + (-cd_no3[2]+cd_no7[2])*dp_rf3_t 
+                   + (-cd_no4[2]+cd_no8[2])*dp_rf4_t)
                         
         #Assembling the matrix of derivatives of interpolation functions 
         #in relation to the parametric coordinates for each Gauss point. 
         deri_phi_param[:,:]=0
         
         deri_phi_param[0,0]=-dp_rf1_r/8
-        deri_phi_param[0,1]=-dp_rf2_r/8
-        deri_phi_param[0,2]=dp_rf2_r/8
-        deri_phi_param[0,3]=dp_rf1_r/8
-        deri_phi_param[0,4]=-dp_rf5_r/8        
-        deri_phi_param[0,5]=-dp_rf6_r/8
-        deri_phi_param[0,6]=dp_rf6_r/8
-        deri_phi_param[0,7]=dp_rf5_r/8
+        deri_phi_param[0,1]=dp_rf1_r/8
+        deri_phi_param[0,2]=dp_rf3_r/8
+        deri_phi_param[0,3]=-dp_rf3_r/8
+        deri_phi_param[0,4]= -dp_rf5_r/8
+        deri_phi_param[0,5]=dp_rf5_r/8
+        deri_phi_param[0,6]=dp_rf7_r/8
+        deri_phi_param[0,7]= -dp_rf7_r/8
         
         deri_phi_param[1,0]=-dp_rf1_s/8
-        deri_phi_param[1,1]=-dp_rf2_s/8
-        deri_phi_param[1,2]=-dp_rf3_s/8
-        deri_phi_param[1,3]=-dp_rf4_s/8
-        deri_phi_param[1,4]=dp_rf1_s/8
-        deri_phi_param[1,5]=dp_rf2_s/8
-        deri_phi_param[1,6]=dp_rf3_s/8
-        deri_phi_param[1,7]=dp_rf4_s/8
+        deri_phi_param[1,1]=-dp_rf3_s/8
+        deri_phi_param[1,2]=dp_rf3_s/8
+        deri_phi_param[1,3]=dp_rf1_s/8
+        deri_phi_param[1,4]=-dp_rf5_s/8
+        deri_phi_param[1,5]=-dp_rf7_s/8
+        deri_phi_param[1,6]=dp_rf7_s/8
+        deri_phi_param[1,7]=dp_rf5_s/8
         
-        deri_phi_param[2,0]=dp_rf1_t/8
-        deri_phi_param[2,1]=-dp_rf1_t/8
+        deri_phi_param[2,0]=-dp_rf1_t/8
+        deri_phi_param[2,1]=-dp_rf2_t/8
         deri_phi_param[2,2]=-dp_rf3_t/8
-        deri_phi_param[2,3]=dp_rf3_t/8
-        deri_phi_param[2,4]=dp_rf5_t/8
-        deri_phi_param[2,5]=-dp_rf5_t/8
-        deri_phi_param[2,6]=-dp_rf7_t/8
-        deri_phi_param[2,7]=dp_rf7_t/8
+        deri_phi_param[2,3]=-dp_rf4_t/8
+        deri_phi_param[2,4]= dp_rf1_t/8
+        deri_phi_param[2,5]=dp_rf2_t/8
+        deri_phi_param[2,6]=dp_rf3_t/8
+        deri_phi_param[2,7]= dp_rf4_t/8
         #Derivative of the interpolation function in relation real 
         #coordinates
         deri_phi_real[cont:cont+3,:]=np.linalg.solve(jacobian,deri_phi_param)
@@ -265,14 +264,14 @@ def get_gauss_parametric_coordinante(gauss_coor):
 
     cte=3**(-1/2)
 
-    gauss_coor[0,0]=-cte  ; gauss_coor[0,1]=-cte; gauss_coor[0,2]=cte   
-    gauss_coor[1,0]=-cte  ; gauss_coor[1,1]=-cte ; gauss_coor[1,2]=-cte   
-    gauss_coor[2,0]=cte  ; gauss_coor[2,1]=-cte  ;  gauss_coor[2,2]=-cte       
-    gauss_coor[3,0]=cte  ; gauss_coor[3,1]=-cte  ;  gauss_coor[3,2]=cte     
-    gauss_coor[4,0]=-cte  ; gauss_coor[4,1]=cte  ;  gauss_coor[4,2]=cte     
-    gauss_coor[5,0]=-cte  ; gauss_coor[5,1]=cte  ;  gauss_coor[5,2]=-cte    
-    gauss_coor[6,0]=cte  ; gauss_coor[6,1]=cte  ;  gauss_coor[6,2]=-cte    
-    gauss_coor[7,0]=cte  ; gauss_coor[7,1]=cte  ;  gauss_coor[7,2]=cte
+    gauss_coor[0,0]=-cte  ; gauss_coor[0,1]=-cte; gauss_coor[0,2]=-cte
+    gauss_coor[1,0]=cte  ; gauss_coor[1,1]=-cte ; gauss_coor[1,2]=-cte
+    gauss_coor[2,0]=cte  ; gauss_coor[2,1]=cte  ;  gauss_coor[2,2]=-cte
+    gauss_coor[3,0]=-cte  ; gauss_coor[3,1]=cte  ;  gauss_coor[3,2]=-cte
+    gauss_coor[4,0]=-cte  ; gauss_coor[4,1]=-cte  ;  gauss_coor[4,2]=cte
+    gauss_coor[5,0]=cte  ; gauss_coor[5,1]=-cte  ;  gauss_coor[5,2]=cte
+    gauss_coor[6,0]=cte  ; gauss_coor[6,1]=cte  ;  gauss_coor[6,2]=cte
+    gauss_coor[7,0]=-cte  ; gauss_coor[7,1]=cte  ;  gauss_coor[7,2]=cte
     
 
     return gauss_coor
@@ -291,24 +290,23 @@ def get_coordinantes_nodes_elem(elem_coord,n_nodes_element,
         elem_coord[i,:]=nodes[n_no,:]
     return elem_coord
 #-----------------------------------------------------------------------------# 
-@jit(nopython=True,cache=True)   
+
 def get_phi(phi,r,s,t):
     """
     Interpolate function
     """
-    phi[0]=(1/8)*(1-r)*(1-s)*(1+t)
-    phi[1]=(1/8)*(1-r)*(1-s)*(1-t)
-    phi[2]=(1/8)*(1+r)*(1-s)*(1-t)
-    phi[3]=(1/8)*(1+r)*(1-s)*(1+t)
-    phi[4]=(1/8)*(1-r)*(1+s)*(1+t)
-    phi[5]=(1/8)*(1-r)*(1+s)*(1-t)    
-    phi[6]=(1/8)*(1+r)*(1+s)*(1-t)
-    phi[7]=(1/8)*(1+r)*(1+s)*(1+t) 
-    
+    phi[0]=(1/8)*(1-r)*(1-s)*(1-t)
+    phi[1]=(1/8)*(1+r)*(1-s)*(1-t)
+    phi[2]=(1/8)*(1+r)*(1+s)*(1-t)
+    phi[3]=(1/8)*(1-r)*(1+s)*(1-t)
+    phi[4]=(1/8)*(1-r)*(1-s)*(1+t)
+    phi[5]=(1/8)*(1+r)*(1-s)*(1+t)
+    phi[6]=(1/8)*(1+r)*(1+s)*(1+t) 
+    phi[7]=(1/8)*(1-r)*(1+s)*(1+t)
     return phi
     
 #-----------------------------------------------------------------------------# 
-@jit(nopython=True,cache=True)   
+
 def get_extrapolate_matrix(N,phi,gauss_coor):
     """
     Extrapolate_matrix

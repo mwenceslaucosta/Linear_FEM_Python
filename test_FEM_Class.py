@@ -47,7 +47,7 @@ class Test_FEM_Class:
         
         #Config Mesh
         config_mesh={}
-        config_mesh['mesh_file_name']=os.path.join(mesh_name)
+        config_mesh['mesh_file_name']=mesh_name
         config_mesh['BC_Neumann_point_X_']=np.array([200])
         config_mesh['BC_Dirichlet_X_']=np.array([0])
         config_mesh['BC_Dirichlet_Y_']=np.array([0])

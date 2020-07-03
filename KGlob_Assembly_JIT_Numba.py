@@ -2,7 +2,8 @@
 """
 Created on Thu Jun 11 15:15:09 2020
 
-@author: mathe
+@author:  Matheus Wenceslau 
+    Assembly logic performed by Thyller Brapp   
 """
 from numba import jit
 import numpy as np 

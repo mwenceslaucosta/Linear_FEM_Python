@@ -2,14 +2,13 @@
 """
 Created on Fri Jun 12 14:25:58 2020
 
-@author: mathe
+@author: Matheus
 """
 from init_Vars import Init_Vars
-#from init_Vars import Init_Vars_VE
-#from init_Vars import Init_Vars_P
 from KGlob_Assembly_JIT_Numba import KGlobal
 from scipy.sparse import coo_matrix,linalg
 from inload import Inload 
+import pos_processing
 import numpy as np 
 
 
@@ -22,7 +21,7 @@ To do:
     Implicit linear dynamics  - Infinitesimal deformation
 """
 
-def static_linear(mesh,material_model,mat_prop):
+def static_linear(mesh,material_model,mat_prop,out_file_name):
     
     Vars=Init_Vars(mesh,material_model)
     
@@ -59,11 +58,20 @@ def static_linear(mesh,material_model,mat_prop):
     displacement=linalg.spsolve(KGlob_csc_BC,load_subtraction)
     
     #Pos-processing 
-    stress,strain=material_model.get_stress_and_strain(Vars.B_all_elem,tang_modu,
-                  Vars.stress,Vars.strain,mesh.connectivity,mesh.n_nodes_elem,
+    extrapol_matrix=mesh.fun_elem.get_extrapolate_matrix(Vars.N,Vars.phi_vec,Vars.gauss_coor)
+    
+    stress_gauss,strain_gauss,stress_nodes,strain_nodes=pos_processing.pos_static_linear(
+                Vars.B_all_elem,tang_modu,Vars.stress_gauss,Vars.strain_gauss,
+                 mesh.connectivity,mesh.n_nodes_elem,
                  mesh.n_Gauss_elem,mesh.DOF_node_elem,displacement,Vars.u_elem,
-                mesh.n_elem)
-    return displacement,stress,strain
+                mesh.n_elem,material_model,Vars.stress_nodes,Vars.strain_nodes,
+                Vars.cont_average,Vars.extrapol_vec_stress,
+                Vars.extrapol_vec_strain,mesh.DOF_stress_strain,extrapol_matrix)
+    
+    #Saving results 
+    pos_processing.save_results(mesh,displacement,stress_nodes,strain_nodes,out_file_name)
+            
+    return displacement,stress_gauss,strain_gauss,stress_nodes,strain_nodes
         
 #-----------------------------------------------------------------------------#        
 def imposing_force_BC(mesh,KGlob_csc,KGlob_csc_BC,load_vector,load_subtraction,cont):
