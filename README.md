@@ -8,13 +8,13 @@
 
 1.	Primeiro deve ser informado o nome do arquivo contendo a malha. Atualmente está implementado elemento 3D hexaédrico e 2D quadrangular. Os arquivos devem estar no formato .med (Salome) ou no formato .inp (Gmsh-Abaqus). A configuração do nome do arquivo é feita no dicionário config_mesh, com a chave “mesh_file_name”, conforme exemplo abaixo. 
 
-		Exemplo: config_mesh['mesh_file_name']='teste_mesh2.inp' 
+		Exemplo: config_mesh['mesh_file_name']='cube1000_bending.inp' 
 
 2.	 Informar valores das condições de contorno (BC) para cada grupo de condição de contorno criado no gerador de malha. O código está preparado para receber valores de deslocamento (condições de Dirichlet) e de força nodal pontual (condições de Neumann) nas direções X, Y e Z. Os vetores seguem o seguinte padrão: 
 	
 	Configuração para BC do tipo Neumann nodal nas direções X, Y e Z:
 		config_mesh['BC_Neumann_point_X_']         
-		config_mesh[BC_Neumann_point_Y_]           
+		config_mesh['BC_Neumann_point_Y_']           
 		config_mesh[‘BC_Neumann_point_Z_’]
 	
 	Configuração para BC do tipo Dirichlet nodal nas direções X, Y e Z:
@@ -23,10 +23,10 @@
 		config_mesh['BC_Dirichlet_Y_']
 
 	Os valores devem ser fornecidos em um vetor que relaciona o nome da condição de contorno com o respectivo 
-	grupo criado. Por exemplo, se foram criados dois grupos de BC do tipo “BC_Neumann_point_X_”, onde o 
+	grupo criado. Por exemplo, em um caso onde foram criados dois grupos do tipo “BC_Neumann_point_X_”, onde o 
 	primeiro  grupo tem valor aplicado de 100N e o segundo 200N, o vetor informado deve ser da seguinte forma: 
 	
-		config_mesh[' BC_Neumann_point_X_']=np.array([100, 200])
+		config_mesh['BC_Neumann_point_X_']=np.array([100, 200])
 	
 	Observe que o “BC_Neumann_point_X_” carrega os valores de todos os grupos do tipo BC_Neumann_point_X_.
 
@@ -60,7 +60,7 @@
         
 		material_model=linear_elasticity_iso_3D
 
-	5.b	Informar parâmetros materiais elásticos: Módulo elástico e coeficiente de Poisson no vetor numpy mat_prop. A primeira posição é o módulo de elasticidade, a segundo corresponde ao Poisson.
+	5.b	Informar parâmetros materiais elásticos: Módulo elástico e coeficiente de Poisson no vetor numpy mat_prop. A primeira posição é o módulo de elasticidade, a segunda corresponde ao Poisson.
       
 	     mat_prop=np.array([210E3,0.29])
 
