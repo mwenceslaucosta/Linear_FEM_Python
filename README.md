@@ -1,4 +1,4 @@
-# FEM_Python
+# Linear_FEM_Python
 
 * Código FEM para análise linear.
 * Pré processamento: Pode ser realizada no Salome ou Gmsh. 
