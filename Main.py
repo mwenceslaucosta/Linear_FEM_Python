@@ -12,8 +12,8 @@ from solvers import static_linear
 
 #Config Mesh
 config_mesh={}
-config_mesh['mesh_file_name']='plate_with_hole.med' #'test_mesh_linux.med'
-config_mesh['BC_Neumann_point_X_']=np.array([1500])
+config_mesh['mesh_file_name']='cube5000_bending.inp' #'test_mesh_linux.med'
+config_mesh['BC_Neumann_point_Y_']=np.array([-100])
 config_mesh['BC_Dirichlet_X_']=np.array([0])
 config_mesh['BC_Dirichlet_Y_']=np.array([0])
 config_mesh['BC_Dirichlet_Z_']=np.array([0])
@@ -31,8 +31,7 @@ mat_prop=np.array([210E3,0.29])
 out_file_name='FEM_out'
 
 #Solver and Poss-processing
-displacement,stress_gauss,strain_gauss,stress_nodes,strain_nodes=static_linear(
-                                    mesh,material_model,mat_prop,out_file_name)
+static_linear(mesh,material_model,mat_prop,out_file_name)
 
 
 

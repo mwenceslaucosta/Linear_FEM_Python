@@ -72,7 +72,7 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
     #Saving results 
     pos_processing.save_results(mesh,displacement,stress_nodes,strain_nodes,out_file_name)
             
-    return displacement,stress_gauss,strain_gauss,stress_nodes,strain_nodes
+   # return displacement,stress_gauss,strain_gauss,stress_nodes,strain_nodes
         
 #-----------------------------------------------------------------------------#        
 def imposing_force_BC(mesh,KGlob_csc,KGlob_csc_BC,load_vector,load_subtraction,cont):
