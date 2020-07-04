@@ -65,5 +65,7 @@
 	     mat_prop=np.array([210E3,0.29])
 
 6.	Informar nome do arquivo de saída.
+		
 		Exemplo: out_file_name='FEM_out'
+		
 		Obs: Por default os dados são salvos no formato .vtk. Este formato pode ser lido facilmente no paraview. 
