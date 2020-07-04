@@ -5,13 +5,14 @@
 * Pós-processamento: O arquivo de saída gerado pode ser utilizado no Paraview.
 
 Exemplo de resultados - Placa com furo central:
-	 Descrição do problema e solução analítica da tensão (stress_X)
+	 
+Descrição do problema e solução analítica da tensão (stress_X)
 	 ![problem_plate](./images/plate_with_hole.PNG)
 	 
-	 Malha hexa gerada no Salome: 
+Malha hexa gerada no Salome: 
 	 ![mesh_problem_plate](./images/mesh_hexa_plate_with_hole.PNG)
 	 
-	 Resultados do campo de tensão na direção X (stress_X) plotados no Paraview
+Resultados do campo de tensão na direção X (stress_X) plotados no Paraview
 	 ![result_problem_plate](./images/fem_foto_result_paraview.PNG)
 
 
