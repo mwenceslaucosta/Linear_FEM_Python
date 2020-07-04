@@ -4,6 +4,17 @@
 * Pré processamento: Pode ser realizada no Salome ou Gmsh. 
 * Pós-processamento: O arquivo de saída gerado pode ser utilizado no Paraview.
 
+Exemplo de resultados - Placa com furo central:
+	 Descrição do problema e solução analítica da tensão (stress_X)
+	 (./images/plate_with_hole.png)
+	 
+	 Malha hexa gerada no Salome: 
+	 (./images/mesh_hexa_plate_with_hole.png)
+	 
+	 Resultados do campo de tensão na direção X (stress_X) plotados no Paraview
+	 (./images/fem_foto_result_paraview.png)
+
+
 ## Etapas para configuração da Análise 
 
 1.	Primeiro deve ser informado o nome do arquivo contendo a malha. Atualmente está implementado elemento 3D hexaédrico e 2D quadrangular. Os arquivos devem estar no formato .med (Salome) ou no formato .inp (Gmsh-Abaqus). A configuração do nome do arquivo é feita no dicionário config_mesh, com a chave “mesh_file_name”, conforme exemplo abaixo. 
@@ -69,3 +80,4 @@
 		Exemplo: out_file_name='FEM_out'
 		
 		Obs: Por default os dados são salvos no formato .vtk. Este formato pode ser lido facilmente no paraview. 
+		
