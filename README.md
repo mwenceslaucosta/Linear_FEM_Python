@@ -22,8 +22,9 @@
 		config_mesh['BC_Dirichlet _Z_']            
 		config_mesh['BC_Dirichlet_Y_']
 
-	Os valores devem ser fornecidos em um vetor que relaciona o nome da condição de contorno com o respectivo grupo criado. 
-	Por exemplo, se foram criados dois grupos de BC do tipo “BC_Neumann_point_X_”, onde o primeiro  grupo tem valor aplicado de 100N e o segundo 200N, o vetor informado deve ser da seguinte forma: 
+	Os valores devem ser fornecidos em um vetor que relaciona o nome da condição de contorno com o respectivo 
+	grupo criado. Por exemplo, se foram criados dois grupos de BC do tipo “BC_Neumann_point_X_”, onde o 
+	primeiro  grupo tem valor aplicado de 100N e o segundo 200N, o vetor informado deve ser da seguinte forma: 
 	
 		config_mesh[' BC_Neumann_point_X_']=np.array([100, 200])
 	
@@ -40,20 +41,28 @@
 		Continua até o grupo N desejado
 
 3.	Informar tipo de elemento (3D ou plane stress): 
+		
 		Obs: Somente 3D implementado no momento. 
+		
 		Exemplo: config_mesh['analysis_dimension']='3D'
 
 4.	Informar nome do arquivo de saída: 
+		
 		Exemplo: out_file_name='FEM_out'
+		
 		Obs: Por default os dados são salvos no formato .vtk. Este formato pode ser lido facilmente no paraview. 
 
 5.	Configurar o modelo constitutivo 
+	
 	5.a	Informar o modelo constitutivo: 
-        Obs: Implementado somente linear elástico 3D por enquanto. 
-        material_model=linear_elasticity_iso_3D
+        
+		Obs: Implementado somente linear elástico 3D por enquanto. 
+        
+		material_model=linear_elasticity_iso_3D
 
 	5.b	Informar parâmetros materiais elásticos: Módulo elástico e coeficiente de Poisson no vetor numpy mat_prop. A primeira posição é o módulo de elasticidade, a segundo corresponde ao Poisson.
-        mat_prop=np.array([210E3,0.29])
+      
+	     mat_prop=np.array([210E3,0.29])
 
 6.	Informar nome do arquivo de saída.
 		Exemplo: out_file_name='FEM_out'
