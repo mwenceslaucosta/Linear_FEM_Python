@@ -6,11 +6,11 @@
 
 Exemplo de resultados - Placa com furo central:
 	 
-	 ![problem_plate](./images/plate_with_hole.PNG)
+![problem_plate](./images/plate_with_hole.PNG)
 	 
-	 ![mesh_problem_plate](./images/mesh_hexa_plate_with_hole.PNG)
+![mesh_problem_plate](./images/mesh_hexa_plate_with_hole.PNG)
 	 
-	 ![result_problem_plate](./images/fem_foto_result_paraview.PNG)
+![result_problem_plate](./images/fem_foto_result_paraview.PNG)
 
 
 ## Etapas para configuração da Análise 
