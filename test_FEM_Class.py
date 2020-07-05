@@ -59,9 +59,8 @@ class Test_FEM_Class:
         
         #Solver and Poss-processing
    
-        displacement,stress_gauss,strain_gauss,stress_nodes,strain_nodes=static_linear(
-                                  mesh,material_model,mat_prop,out_file_name)
-        return displacement
+        result=static_linear(mesh,material_model,mat_prop,out_file_name)
+        return result['displacement']
         
 
 #-----------------------------------------------------------------------------# 

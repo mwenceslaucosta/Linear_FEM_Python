@@ -57,7 +57,8 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
   
     #Displacement 
     displacement=linalg.spsolve(KGlob_csc_BC,load_subtraction)
-    
+    result={}
+    result['displacement']=displacement
     #Pos-processing 
     extrapol_matrix=mesh.fun_elem.get_extrapolate_matrix(Vars.N,Vars.phi_vec,Vars.gauss_coor,mesh.mesh_type)
     
@@ -68,11 +69,15 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
                 mesh.n_elem,material_model,Vars.stress_nodes,Vars.strain_nodes,
                 Vars.cont_average,Vars.extrapol_vec_stress,
                 Vars.extrapol_vec_strain,mesh.DOF_stress_strain,extrapol_matrix)
+    result['stress_gauss']=stress_gauss
+    result['strain_gauss']=strain_gauss
+    result['stress_nodes']=stress_nodes
+    result['strain_nodes']=strain_nodes
     
     #Saving results 
     pos_processing.save_results(mesh,displacement,stress_nodes,strain_nodes,out_file_name)
             
-   # return displacement,stress_gauss,strain_gauss,stress_nodes,strain_nodes
+    return result
         
 #-----------------------------------------------------------------------------#        
 def imposing_force_BC(mesh,KGlob_csc,KGlob_csc_BC,load_vector,load_subtraction,cont):

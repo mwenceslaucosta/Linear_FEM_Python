@@ -31,7 +31,7 @@ mat_prop=np.array([210E3,0.29])
 out_file_name='FEM_out'
 
 #Solver and Poss-processing
-static_linear(mesh,material_model,mat_prop,out_file_name)
+result=static_linear(mesh,material_model,mat_prop,out_file_name)
 
 
 
