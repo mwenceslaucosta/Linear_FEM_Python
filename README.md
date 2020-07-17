@@ -68,8 +68,11 @@ Exemplo de resultados - Placa com furo central:
 		3.a Para análise 2D é necessário informar o valor de espessura de cada grupo de elementos. 
 			Estes valores são informados no vetor config_mesh['Thickness_Group_']
 			
-			Caso existam elementos com espessuras diferentes, devem ser criados grupos no gerador de malha para cada valor de espessura. 
-			Ex: Supondo que a geometria apresente regioes com espessura de 6 e 4. Nessas condições os seguintes grupos de superficie devem ser criados:
+			Caso existam elementos com espessuras diferentes, devem ser criados grupos no gerador de malha 
+			para cada valor de espessura. 
+			
+			Ex: Supondo que a geometria apresente regioes com espessura de 6 e 4. Nessas condições os seguin-
+			    tes grupos de superficie devem ser criados:
 				Grupo 1 de espessura contendo todos elementos de espessura 6: Thickness_Group_0 
 				Grupo 2 de espessura contendo todos elementos de espessura 4: Thickness_Group_1
 				Continua até o grupo N desejado																
