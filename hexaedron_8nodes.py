@@ -10,7 +10,7 @@ from numba import jit
 @jit(nopython=True,cache=True)
 def B_and_Ke_elem(gauss_coord,gauss_weight,elem_coord,connectivity,
                    jacobian,det_Jacobian,deri_phi_param,deri_phi_real,B_elem,
-                   B_t,B_Gauss,Ke,nodes,tang_modu,mesh_type):
+                   B_t,B_Gauss,nodes,tang_modu,mesh_type,K_e):
     
     """
     Function to calculate B_all, Ke_all and det of the Jacobian of all elements
@@ -43,9 +43,9 @@ def B_and_Ke_elem(gauss_coord,gauss_weight,elem_coord,connectivity,
     #B Matrix
     B_elem=B_matrix(n_gauss,B_elem,deri_phi_real) 
     #Ke Matrix    
-    Ke=Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,
-                            B_elem,B_Gauss,B_t,tang_modu)
-    return Ke,B_elem
+    K_e=Ke_matrix(gauss_weight,n_gauss,det_Jacobian,
+                            B_elem,B_Gauss,B_t,tang_modu,K_e)
+    return K_e,B_elem
 
 #-----------------------------------------------------------------------------
 
@@ -315,34 +315,13 @@ def B_matrix(n_gauss,B_elem,deri_phi_real):
 #-----------------------------------------------------------------------------
 
 @jit(nopython=True,cache=True)
-def Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,B_elem,B_Gauss,B_t,tang_modu):
-    
+def Ke_matrix(gauss_weight,n_gauss,det_Jacobian,B_elem,B_Gauss,B_t,tang_modu,K_e):
+    # K_e=np.zeros((24,24))
     cont_g=0 
-    # cont_inter=0
-    # n_inter=int(inter_var.shape[0]/(2*n_gauss))
-    # n_s=int(stress.shape[0]/2)
-    
-    # inter_var_0=inter_var[0:n_s]
-    # stress_0=stress[0:n_s]
-    # strain_0=strain[0:n_s]
-    
-    # inter_var_1=inter_var[n_s::]
-    # stress_1=stress[n_s::]
-    # strain_1=strain[n_s::]
-    Ke[:,:]=0
+    K_e[:,:]=0
     for n_g in range(n_gauss):
         B_Gauss[:,:]=B_elem[cont_g:cont_g+6,:]
-        B_t[:,:]=np.transpose(B_Gauss)
-        
-        #Material model call 
-        # stress_gauss_0=np.copy(stress_0[cont_g:cont_g+6])
-        # stress_gauss_1=np.copy(stress_1[cont_g:cont_g+6])
-        # strain_gauss_0=np.copy(strain_0[cont_g:cont_g+6])
-        # strain_gauss_1=np.copy(strain_1[cont_g:cont_g+6])
-        
-        # inter_var_gauss_0=np.copy(inter_var_0[cont_inter:cont_inter+n_inter])
-        # inter_var_gauss_1=np.copy(inter_var_1[cont_inter:cont_inter+n_inter])
-                        
+        B_t[:,:]=np.transpose(B_Gauss)                       
         #Gauss quadrature 
         w_i=gauss_weight[n_g,0]
         w_j=gauss_weight[n_g,1]
@@ -350,21 +329,10 @@ def Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,B_elem,B_Gauss,B_t,tang_modu)
         A=det_Jacobian[n_g]*w_i*w_j*w_k
         B_we=B_Gauss*A
         dot_B_t_D=np.dot(B_t,tang_modu)
-        Ke=Ke+np.dot(dot_B_t_D,B_we)                                                                 
-        
-        #Updating variables 
-        # stress_0[cont_g:cont_g+6]=stress_1[cont_g:cont_g+6]
-        # strain_0[cont_g:cont_g+6]=strain_1[cont_g:cont_g+6]
-        # inter_var_0[cont_inter:cont_inter+n_inter]=inter_var_1[cont_inter:cont_inter+n_inter]
-        
-        # stress_1[cont_g:cont_g+6]=stress_gauss_1
-        # strain_1[cont_g:cont_g+6]=strain_gauss_1
-        # inter_var_1[cont_inter:cont_inter+n_inter]=inter_var_gauss_1
-               
+        K_e+=np.dot(dot_B_t_D,B_we)                                                                                
         cont_g=cont_g+6
-        # cont_inter=cont_inter+n_inter
         
-    return Ke
+    return K_e
 #-----------------------------------------------------------------------------
 
 @jit(nopython=True,cache=True)
@@ -439,7 +407,7 @@ def get_phi(phi,r,s,t,mesh_type):
         phi[7]=(1/8)*(1+r)*(1+s)*(1+t) 
     
     return phi
-    
+
 #-----------------------------------------------------------------------------# 
 @jit(nopython=True,cache=True)   
 def get_extrapolate_matrix(N,phi,gauss_coor,mesh_type):

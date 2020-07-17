@@ -8,16 +8,16 @@ import numpy as np
 from mesh import MeshFEM 
 import linear_elasticity_iso_3D 
 from solvers import static_linear
- 
 
 #Config Mesh
 config_mesh={}
-config_mesh['mesh_file_name']='cube5000_bending.inp' #'test_mesh_linux.med'
-config_mesh['BC_Neumann_point_Y_']=np.array([-100])
+config_mesh['mesh_file_name']='plate_with_hole3D_final.med' 
+config_mesh['BC_Neumann_point_X_']=np.array([1500])
 config_mesh['BC_Dirichlet_X_']=np.array([0])
 config_mesh['BC_Dirichlet_Y_']=np.array([0])
 config_mesh['BC_Dirichlet_Z_']=np.array([0])
 config_mesh['analysis_dimension']='3D'
+#config_mesh['Thickness_Group_']=np.array([6])
 mesh=MeshFEM(config_mesh)
 
 #Config Material model  
@@ -32,6 +32,5 @@ out_file_name='FEM_out'
 
 #Solver and Poss-processing
 result=static_linear(mesh,material_model,mat_prop,out_file_name)
-
 
 

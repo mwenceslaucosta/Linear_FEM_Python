@@ -4,14 +4,14 @@ Created on Mon Jun 22 16:34:27 2020
 
 @author: Matheus Wenceslau
 """
+import numpy as np
+from numba import jit
 
-
-@jit(nopython=True,cache=True)
+#@jit(nopython=True,cache=True)
 def B_and_Ke_elem(gauss_coord,gauss_weight,elem_coord,connectivity,
                    jacobian,det_Jacobian,deri_phi_param,deri_phi_real,B_elem,
-                   B_t,B_Gauss,Ke,nodes,tang_modu,thickness):
+                   B_t,B_Gauss,nodes,tang_modu,K_elem,thickness):
     
-
     """
     Function to calculate B_all, Ke_all and det of the Jacobian
 
@@ -43,13 +43,13 @@ def B_and_Ke_elem(gauss_coord,gauss_weight,elem_coord,connectivity,
     #B Matrix
     B_elem=B_matrix(n_gauss,B_elem,deri_phi_real) 
     #Ke Matrix    
-    Ke=Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,
+    K_elem=Ke_matrix(K_elem,gauss_weight,n_gauss,det_Jacobian,
                             B_elem,B_Gauss,B_t,tang_modu,thickness)
-    return Ke,B_elem
+    return K_elem,B_elem
 
 #-----------------------------------------------------------------------------
 
-@jit(nopython=True,cache=True)
+#@jit(nopython=True,cache=True)
 def Interpol_fun_derivative(gauss_coord,elem_coord,jacobian,n_gauss,deri_phi_param,
                             det_Jacobian,deri_phi_real):      
     cd_no1=elem_coord[0,:] 
@@ -74,21 +74,21 @@ def Interpol_fun_derivative(gauss_coord,elem_coord,jacobian,n_gauss,deri_phi_par
         
         #dx_dr
         jacobian[0,0]=(1/4)*((-cd_no1[0]+cd_no2[0])*dp_rf1_r  
-                    +(cd_no3[0]-cd_no4[0])*dp_rf3_r
+                    +(cd_no3[0]-cd_no4[0])*dp_rf3_r)
       
         
         #dx_ds
         jacobian[1,0]=(1/4)*((-cd_no1[0]+cd_no4[0])*dp_rf1_s 
-                    + (-cd_no2[0]+cd_no3[0])*dp_rf3_s
+                    + (-cd_no2[0]+cd_no3[0])*dp_rf3_s)
 
 
         #dy_dr
         jacobian[0,1]=(1/4)*((-cd_no1[1]+cd_no2[1])*dp_rf1_r  
-                    + (cd_no3[1]-cd_no4[1])*dp_rf3_r
+                    + (cd_no3[1]-cd_no4[1])*dp_rf3_r)
                   
         #dy_ds
         jacobian[1,1]=(1/4)*((-cd_no1[1]+cd_no4[1])*dp_rf1_s 
-                             + (-cd_no2[1]+cd_no3[1])*dp_rf3_s
+                             + (-cd_no2[1]+cd_no3[1])*dp_rf3_s)
                  
                         
         #Assembling the matrix of derivatives of interpolation functions 
@@ -117,7 +117,7 @@ def Interpol_fun_derivative(gauss_coord,elem_coord,jacobian,n_gauss,deri_phi_par
     return deri_phi_real,det_Jacobian
 #-----------------------------------------------------------------------------
 
-@jit(nopython=True,cache=True)
+#@jit(nopython=True,cache=True)
 def B_matrix(n_gauss,B_elem,deri_phi_real):            
     #B matrix
     #B_ele[0:3,:]= B matrix of the first guass point
@@ -140,7 +140,7 @@ def B_matrix(n_gauss,B_elem,deri_phi_real):
     return B_elem
 #-----------------------------------------------------------------------------
 
-@jit(nopython=True,cache=True)
+#@jit(nopython=True,cache=True)
 def Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,B_elem,B_Gauss,B_t,tang_modu,
               thickness):
     
@@ -164,7 +164,7 @@ def Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,B_elem,B_Gauss,B_t,tang_modu,
     return Ke
 #-----------------------------------------------------------------------------
 
-@jit(nopython=True,cache=True)
+#@jit(nopython=True,cache=True)
 def get_gauss_parametric_coordinante(gauss_coor):
     
     """
@@ -182,7 +182,7 @@ def get_gauss_parametric_coordinante(gauss_coor):
 
 #-----------------------------------------------------------------------------# 
 
-@jit(nopython=True,cache=True)               
+#@jit(nopython=True,cache=True)               
 def get_coordinantes_nodes_elem(elem_coord,n_nodes_element,
                                 connectivity_el,nodes):
     """
@@ -195,7 +195,7 @@ def get_coordinantes_nodes_elem(elem_coord,n_nodes_element,
     return elem_coord
 #-----------------------------------------------------------------------------# 
 
-def get_phi(phi,r,s,t):
+def get_phi(phi,r,s):
     """
     Interpolate function
     """
@@ -213,7 +213,7 @@ def get_extrapolate_matrix(N,phi,gauss_coor):
     """
     gauss_coor=get_gauss_parametric_coordinante(gauss_coor)
     for i in range(4):
-        phi=get_phi(phi,gauss_coor[i,0],gauss_coor[i,1],gauss_coor[i,2])
+        phi=get_phi(phi,gauss_coor[i,0],gauss_coor[i,1])
         for j in range(4):
             N[i,j]=phi[j]
      

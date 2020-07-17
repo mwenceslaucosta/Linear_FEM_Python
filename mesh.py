@@ -82,7 +82,19 @@ class MeshFEM:
             #Salome Format - .med 
             self.get_BC_med(config_mesh)
         
-
+        #Thickness 2D Analysis 
+        if config_mesh['analysis_dimension']=='2D_plane_stress':
+            if 'Thickness_Group_' not in config_mesh:
+                sys.exit('Fatal error: Thickness not informed')
+            else:
+                if len(config_mesh['Thickness_Group_'])>1:
+                    self.get_thickness_groups_med(self.meshio_,config_mesh)
+                else:
+                    thickness_value=config_mesh['Thickness_Group_']
+                    self.thickness_vector=np.ones(self.n_elem)*thickness_value
+                
+        
+       
       
 #-----------------------------------------------------------------------------
             
@@ -389,17 +401,32 @@ class MeshFEM:
           
          
 #-----------------------------------------------------------------------------
+
+    def get_thickness_groups_med(self,read_mesh,config_mesh):
+        """ 
+        Method to get a vector containing the thickness of all elements
+        in med format
+        """
+        n_thickness=len(config_mesh['Thickness_Group_'])
+        self.thickness_vector=np.zeros(self.n_elem)
+        for elem in range(self.n_elem):
+            thickness_key=read_mesh.cell_data['cell_tags'][0][elem]
+            for key in read_mesh.cell_tags[thickness_key]:
+                if key!='Group_Of_All_Faces':
+                    suffix=int(key[-1])
+                    if n_thickness<suffix+1:
+                        sys.exit('Fatal error. Number of thickness groups does \
+                                 not match with the mesh thcickness number')
+                    else:
+                        thickness_value=config_mesh['Thickness_Group_'][suffix]
+                        self.thickness_vector[elem]=thickness_value
+            
+
+#-----------------------------------------------------------------------------
     def get_connectivity(self,read_mesh):
         """
         Call methods to allocate connectivity and nodes coordi
         """
-        if not (i=="quad" or i=="line" for i in read_mesh.cells_dict):
-            sys.exit("Fatal error: Element not implemented. Only C3D8 \
-                        hexaedron implemented")
-            #Descomentar e colocar essa parte quando implementar hexa.
-            #not (i=="quad" or i=="hexahedron" or i=="line" 
-            #                            for i in read_mesh.cells_dict):
-            #Only one el
         cont=0
         if self.analysis_dimension=='3D':
             if "hexahedron" in read_mesh.cells_dict:
@@ -412,7 +439,7 @@ class MeshFEM:
                 self.DOF_node_elem=3
                 self.n_Gauss_elem=8
                 self.DOF_stress_strain=6
-                self.n_DOF_elem=self.n_nodes_elem*self.DOF_node_elem
+                self.DOF_elem=self.n_nodes_elem*self.DOF_node_elem
 
                 import hexaedron_8nodes 
                 self.fun_elem=hexaedron_8nodes 
@@ -435,7 +462,7 @@ class MeshFEM:
                 self.DOF_node_elem=2
                 self.n_Gauss_elem=4
                 self.DOF_stress_strain=3
-                self.n_DOF_elem=self.n_nodes_elem*self.DOF_node_elem
+                self.DOF_elem=self.n_nodes_elem*self.DOF_node_elem
                 import quad_4nodes
                 self.fun_elem=quad_4nodes
 

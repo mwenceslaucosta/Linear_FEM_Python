@@ -13,7 +13,7 @@ class Init_Vars:
     def __init__(self,mesh,mat_model):
         
         #Initializing arrays used in the global stiffiness assembly
-        n_positions=mesh.n_DOF_elem*mesh.n_DOF_elem*mesh.n_elem   
+        n_positions=mesh.DOF_elem*mesh.DOF_elem*mesh.n_elem   
         self.coo_i=np.zeros(n_positions,dtype=np.int32)
         self.coo_j=np.zeros(n_positions,dtype=np.int32)
         self.coo_data=np.zeros(n_positions)
@@ -27,7 +27,7 @@ class Init_Vars:
         elif mesh.DOF_node_elem==2:
             n_Voight=3
         else:
-            sys.exit('Number of Voigth component do not match')  
+            sys.exit('Fatal error: Number of Voigth component do not match')  
         
         self.elem_coor=np.zeros((mesh.n_nodes_elem,mesh.DOF_node_elem))
         self.phi=np.zeros((mesh.n_nodes_elem,mesh.n_Gauss_elem))
@@ -37,33 +37,40 @@ class Init_Vars:
         self.deri_phi_param=np.zeros((mesh.DOF_node_elem,mesh.n_Gauss_elem))
         self.gauss_coor=np.zeros((mesh.n_nodes_elem,mesh.DOF_node_elem))
         self.gauss_weight=np.zeros((mesh.n_nodes_elem,mesh.DOF_node_elem))
-        self.B_elem=np.zeros((n_Voight*mesh.n_Gauss_elem,mesh.n_DOF_elem))
-        self.B_all_elem=np.zeros((n_Voight*mesh.n_Gauss_elem*mesh.n_elem,mesh.n_DOF_elem))
+        self.B_elem=np.zeros((n_Voight*mesh.n_Gauss_elem,mesh.DOF_elem))
+        self.B_all_elem=np.zeros((n_Voight*mesh.n_Gauss_elem*mesh.n_elem,mesh.DOF_elem))
+        self.Ke_all_elem=np.zeros((mesh.DOF_elem*mesh.n_elem,mesh.DOF_elem))
         self.B_t=np.zeros((mesh.n_nodes_elem*mesh.DOF_node_elem,n_Voight))
-        self.Ke=np.zeros((mesh.n_DOF_elem,mesh.n_DOF_elem))
-        self.B_Gauss=np.zeros((n_Voight,mesh.n_DOF_elem)) 
+        self.K_e=np.zeros((mesh.DOF_elem,mesh.DOF_elem))
+        self.B_Gauss=np.zeros((n_Voight,mesh.DOF_elem)) 
         self.N=np.zeros((mesh.n_nodes_elem,mesh.n_nodes_elem))
         self.phi_vec=N=np.zeros(mesh.n_nodes_elem)
-        # Initializing non-linear constitutive model arrays
+
+        material_name=mat_model.__name__
+        if material_name.endswith('3D') and mesh.DOF_node_elem==2:
+            sys.exit('Fatal error: Constitutive model does not match mesh type')
+        elif material_name.endswith('2D') and mesh.DOF_node_elem==3:
+            sys.exit('Fatal error: Constitutive model does not match mesh type')
+        
         # To do 
-        if mat_model.__name__ == 'plastic_Mises3D':
+        if material_name == 'plastic_Mises_3D':
             self.stress=np.zeros((6*mesh.n_Gauss_elem*2,mesh.n_elem))
             self.strain=np.zeros((6*mesh.n_Gauss_elem*2,mesh.n_elem))
             self.inter_var=np.zeros((13*mesh.n_Gauss_elem*2,mesh.n_elem))
             self.tang_modu=np.zeros((6,6))
                         
-        elif mat_model.__name__== 'linear_elasticity_iso_3D':
-            self.stress_gauss=np.zeros((mesh.n_elem,6*mesh.n_Gauss_elem))
-            self.strain_gauss=np.zeros((mesh.n_elem,6*mesh.n_Gauss_elem))
-            self.stress_nodes=np.zeros((mesh.n_nodes_glob,6)) 
-            self.strain_nodes=np.zeros((mesh.n_nodes_glob,6)) 
+        elif (material_name == 'linear_elasticity_iso_3D' or 
+              material_name == 'plane_stress_lin_elast_iso_2D'):
+            self.stress_gauss=np.zeros((mesh.n_elem,n_Voight*mesh.n_Gauss_elem))
+            self.strain_gauss=np.zeros((mesh.n_elem,n_Voight*mesh.n_Gauss_elem))
+            self.stress_nodes=np.zeros((mesh.n_nodes_glob,n_Voight)) 
+            self.strain_nodes=np.zeros((mesh.n_nodes_glob,n_Voight)) 
             self.cont_average=np.zeros(mesh.n_nodes_glob)
             self.extrapol_vec_strain=np.zeros(mesh.n_nodes_elem)
             self.extrapol_vec_stress=np.zeros(mesh.n_nodes_elem)
-            #self.inter_var=np.zeros((12*mesh.n_Gauss_elem,mesh.n_elem))
-            self.tang_modu=np.zeros((6,6))
+            self.tang_modu=np.zeros((n_Voight,n_Voight))
 
-        self.u_glob=np.zeros((6*mesh.n_Gauss_elem*2,mesh.n_elem))
+        self.u_glob=np.zeros((n_Voight*mesh.n_Gauss_elem*2,mesh.n_elem))
         self.u_elem=np.zeros(mesh.DOF_node_elem*mesh.n_nodes_elem)
             
         

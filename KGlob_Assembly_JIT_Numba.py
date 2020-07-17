@@ -5,7 +5,7 @@ Created on Thu Jun 11 15:15:09 2020
 @author:  Matheus Wenceslau 
     Assembly logic performed by Thyller Brapp   
 """
-from numba import jit
+from numba import jit,prange
 import numpy as np 
 from hexaedron_8nodes import B_and_Ke_elem
 
@@ -13,24 +13,18 @@ from hexaedron_8nodes import B_and_Ke_elem
 @jit(nopython=True,cache=True)
 def KGlobal(n_elem,n_nodes_element,DOF,cont,Dirichlet_DOF,Dirichlet_values,
             force_vector,connectivity,load_subtraction,coo_i,coo_j,coo_data,
-            coo_data_BC,gauss_coord,gauss_weight,elem_coord,
-            jacobian,det_Jacobian,deri_phi_param,deri_phi_real,B_elem,B_t,
-            B_Gauss,K_e,nodes,tang_modu,B_all_elem,mesh_type):
+            coo_data_BC,K_e,Ke_all_elem,DOF_elem):
     """
     Function to assembly global stifiness matrix.  
     
     """
+    
     n_BC=Dirichlet_DOF.shape[0]
     cont[2]=0
     for M in range(n_elem):
+        K_e[:,:]=Ke_all_elem[M*DOF_elem:(M*DOF_elem+DOF_elem),:]
         cont[0]=0
-        #u_elem=get_u_elem(connectivity[M,:],n_nodes_element,DOF,u_glob,u_elem)
-        K_e,B_e=B_and_Ke_elem(gauss_coord,
-                            gauss_weight,elem_coord,connectivity[M,:],
-                            jacobian,det_Jacobian,deri_phi_param,deri_phi_real,
-                            B_elem,B_t,B_Gauss,K_e,nodes,tang_modu,mesh_type) 
-        B_all_elem[M*48:(M*48+48),:]=B_e[:,:]
-           
+        #u_elem=get_u_elem(connectivity[M,:],n_nodes_element,DOF,u_glob,u_elem)                               
         for i in range(n_nodes_element):
             for j in range(DOF):
                 cont[0]+=+1
@@ -56,6 +50,5 @@ def KGlobal(n_elem,n_nodes_element,DOF,cont,Dirichlet_DOF,Dirichlet_values,
                                 coo_data_BC[cont[2]]=0
                         cont[1]+=1
                         cont[2]+=1  
-    return coo_i,coo_j,coo_data,coo_data_BC,B_all_elem
-
-#-----------------------------------------------------------------------------
+    return coo_i,coo_j,coo_data,coo_data_BC        
+ #-----------------------------------------------------------------------------
