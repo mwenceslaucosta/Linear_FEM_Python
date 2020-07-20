@@ -7,7 +7,7 @@ Created on Thu Jun 11 15:15:09 2020
 """
 from numba import jit,prange
 import numpy as np 
-from hexaedron_8nodes import B_and_Ke_elem
+
 
 #-----------------------------------------------------------------------------
 @jit(nopython=True,cache=True)

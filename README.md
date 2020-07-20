@@ -31,7 +31,7 @@ Exemplo de resultados - Placa com furo central:
 	
 	Configuração para BC do tipo Dirichlet nodal nas direções X, Y e Z:
 		config_mesh['BC_Dirichlet_X_']             
-		config_mesh['BC_Dirichlet _Z_']            
+		config_mesh['BC_Dirichlet_Z_']            
 		config_mesh['BC_Dirichlet_Y_']
 
 	Os valores devem ser fornecidos em um vetor que relaciona o nome da condição de contorno com o respectivo 
@@ -71,7 +71,7 @@ Exemplo de resultados - Placa com furo central:
 			Caso existam elementos com espessuras diferentes, devem ser criados grupos no gerador de malha 
 			para cada valor de espessura. 
 			
-			Ex: Supondo que a geometria apresente regioes com espessura de 6 e 4. Nessas condições os seguin-
+			Ex: Supondo que a geometria apresente regioes com espessura de 6 e 4. Nessas condições, os seguin-
 			    tes grupos de superficie devem ser criados:
 				Grupo 1 de espessura contendo todos elementos de espessura 6: Thickness_Group_0 
 				Grupo 2 de espessura contendo todos elementos de espessura 4: Thickness_Group_1

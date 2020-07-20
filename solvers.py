@@ -28,10 +28,9 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
     #External force
     external_force=Inload(mesh)
     load_vector=external_force.load_vector
+    
     #Global Arrays
     Init_Vars
-
-
     
     #Elementary stifiness (Ke) and derivative matrix (B)
     element=mesh.fun_elem
@@ -65,7 +64,7 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
                     external_force.load_vector,Vars.load_subtraction,Vars.cont)
   
     #Displacement 
-    displacement=linalg.spsolve(KGlob_csr_BC,load_subtraction)
+    displacement,nothing=linalg.cg(KGlob_csr_BC,load_subtraction)
     result={}
     result['displacement']=displacement
     
@@ -89,7 +88,7 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
     result['strain_gauss']=strain_gauss
     result['stress_nodes']=stress_nodes
     result['strain_nodes']=strain_nodes
-    
+ 
     #Saving results 
     pos_processing.save_results(mesh,displacement,stress_nodes,strain_nodes,out_file_name)
             
@@ -137,19 +136,21 @@ def get_Ke_all_and_B_all(mesh,material_model,element,mat_prop,Vars,thickness_vec
     n_Gauss_elem=mesh.n_Gauss_elem
     DOF_stress_strain=mesh.DOF_stress_strain
     tang_modu=material_model.tg_modulus(Vars.tang_modu,mat_prop)
+    
+    n_compnts_B=DOF_stress_strain*n_Gauss_elem
+    K_elem=np.zeros((DOF_elem,DOF_elem))
+    gauss_coord=np.zeros((n_Gauss_elem,DOF_node_elem))
+    gauss_weight=np.zeros((n_Gauss_elem,DOF_node_elem))
+    elem_coord=np.zeros((n_Gauss_elem,DOF_node_elem))
+    jacobian=np.zeros((DOF_node_elem,DOF_node_elem))
+    det_Jacobian=np.zeros(n_Gauss_elem)
+    deri_phi_param=np.zeros((DOF_node_elem,n_Gauss_elem))
+    deri_phi_real=np.zeros((DOF_elem,n_Gauss_elem))
+    B_elem=np.zeros((n_compnts_B,DOF_elem))
+    B_t=np.zeros((DOF_elem,DOF_stress_strain))
+    B_Gauss=np.zeros((DOF_stress_strain,DOF_elem))
     for M in range(n_elem):
-        n_compnts_B=DOF_stress_strain*n_Gauss_elem
-        K_elem=np.zeros((DOF_elem,DOF_elem))
-        gauss_coord=np.zeros((n_Gauss_elem,DOF_node_elem))
-        gauss_weight=np.zeros((n_Gauss_elem,DOF_node_elem))
-        elem_coord=np.zeros((n_Gauss_elem,DOF_node_elem))
-        jacobian=np.zeros((DOF_node_elem,DOF_node_elem))
-        det_Jacobian=np.zeros(n_Gauss_elem)
-        deri_phi_param=np.zeros((DOF_node_elem,n_Gauss_elem))
-        deri_phi_real=np.zeros((DOF_elem,n_Gauss_elem))
-        B_elem=np.zeros((n_compnts_B,DOF_elem))
-        B_t=np.zeros((DOF_elem,DOF_stress_strain))
-        B_Gauss=np.zeros((DOF_stress_strain,DOF_elem))
+
         
         #2D Analysis
         if mesh.DOF_node_elem==2:

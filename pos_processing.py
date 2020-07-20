@@ -6,7 +6,7 @@ Created on Thu Jun 18 17:24:04 2020
 """
 from numba import jit
 import meshio
-
+import numpy as np
 def pos_static_linear(B_all_elem,tang_modu,stress_gauss,
                       strain_gauss,connectivity,n_nodes_elem,n_Gauss_elem,
                       DOF_node_elem,displacement,u_elem,n_elem,material_model,
@@ -64,7 +64,7 @@ def save_results(mesh,displacement,stress_nodes,strain_nodes,out_file_name):
         mesh.meshio_.point_data['stress_nodes_XY']=stress_nodes[:,2]
         mesh.meshio_.point_data['displacement_X']=displacement[0::2]
         mesh.meshio_.point_data['displacement_Y']=displacement[1::2]
-        
+ 
         save_file_name=out_file_name+'.vtk'
         #mesh.meshio_.write(save_file_name)
         points = mesh.nodes
