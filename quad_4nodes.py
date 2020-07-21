@@ -7,7 +7,7 @@ Created on Mon Jun 22 16:34:27 2020
 import numpy as np
 from numba import jit
 
-#@jit(nopython=True,cache=True)
+@jit(nopython=True,cache=True)
 def B_and_Ke_elem(gauss_coord,gauss_weight,elem_coord,connectivity,
                    jacobian,det_Jacobian,deri_phi_param,deri_phi_real,B_elem,
                    B_t,B_Gauss,nodes,tang_modu,K_elem,thickness):
@@ -49,7 +49,7 @@ def B_and_Ke_elem(gauss_coord,gauss_weight,elem_coord,connectivity,
 
 #-----------------------------------------------------------------------------
 
-#@jit(nopython=True,cache=True)
+@jit(nopython=True,cache=True)
 def Interpol_fun_derivative(gauss_coord,elem_coord,jacobian,n_gauss,deri_phi_param,
                             det_Jacobian,deri_phi_real):      
     cd_no1=elem_coord[0,:] 
@@ -117,7 +117,7 @@ def Interpol_fun_derivative(gauss_coord,elem_coord,jacobian,n_gauss,deri_phi_par
     return deri_phi_real,det_Jacobian
 #-----------------------------------------------------------------------------
 
-#@jit(nopython=True,cache=True)
+@jit(nopython=True,cache=True)
 def B_matrix(n_gauss,B_elem,deri_phi_real):            
     #B matrix
     #B_ele[0:3,:]= B matrix of the first guass point
@@ -140,7 +140,7 @@ def B_matrix(n_gauss,B_elem,deri_phi_real):
     return B_elem
 #-----------------------------------------------------------------------------
 
-#@jit(nopython=True,cache=True)
+@jit(nopython=True,cache=True)
 def Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,B_elem,B_Gauss,B_t,tang_modu,
               thickness):
     
@@ -164,7 +164,7 @@ def Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,B_elem,B_Gauss,B_t,tang_modu,
     return Ke
 #-----------------------------------------------------------------------------
 
-#@jit(nopython=True,cache=True)
+@jit(nopython=True,cache=True)
 def get_gauss_parametric_coordinante(gauss_coor):
     
     """
@@ -182,7 +182,7 @@ def get_gauss_parametric_coordinante(gauss_coor):
 
 #-----------------------------------------------------------------------------# 
 
-#@jit(nopython=True,cache=True)               
+@jit(nopython=True,cache=True)               
 def get_coordinantes_nodes_elem(elem_coord,n_nodes_element,
                                 connectivity_el,nodes):
     """

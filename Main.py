@@ -8,7 +8,6 @@ import numpy as np
 from mesh import MeshFEM 
 import plane_stress_lin_elast_iso_2D 
 from solvers import static_linear
-import time 
 
 
 #Config Mesh
