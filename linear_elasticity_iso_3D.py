@@ -46,7 +46,7 @@ def get_stress_and_strain(B_all_elem,tangent_modulus,stress,strain,connectivity,
     for elem in range(n_elem):
         u_elem=get_u_elem(connectivity[elem,:],n_nodes_element,DOF,u_glob,u_elem)
         u_elem_contig=np.ascontiguousarray(u_elem)
-        B_elem=B_all_elem[elem*48:(elem*48+48),:]  
+        B_elem=B_all_elem[elem*n_gauss*6:(elem*n_gauss*6+n_gauss*6),:]  
         for gauss in range(n_gauss):
             #B_ele[0:6,:]= B matrix of the first guass point
             B_Gauss=np.ascontiguousarray(B_elem[gauss*6:(gauss*6+6),:])

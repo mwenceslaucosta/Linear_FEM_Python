@@ -13,7 +13,7 @@ def B_and_Ke_elem(gauss_coord,gauss_weight,elem_coord,connectivity,
                    B_t,B_Gauss,nodes,tang_modu,K_elem,thickness):
     
     """
-    Function to calculate B_all, Ke_all and det of the Jacobian
+    Function to calculate B_elem and K_elem 
 
     """
     B_elem[:,:]=0
@@ -143,6 +143,9 @@ def B_matrix(n_gauss,B_elem,deri_phi_real):
 @jit(nopython=True,cache=True)
 def Ke_matrix(Ke,gauss_weight,n_gauss,det_Jacobian,B_elem,B_Gauss,B_t,tang_modu,
               thickness):
+    """
+    Element Stiffness Matrix
+    """
     
     cont_g=0 
     Ke[:,:]=0
@@ -194,7 +197,7 @@ def get_coordinantes_nodes_elem(elem_coord,n_nodes_element,
         elem_coord[i,:]=nodes[n_no,:]
     return elem_coord
 #-----------------------------------------------------------------------------# 
-
+@jit(nopython=True,cache=True)  
 def get_phi(phi,r,s):
     """
     Interpolate function
@@ -206,7 +209,7 @@ def get_phi(phi,r,s):
     return phi
     
 #-----------------------------------------------------------------------------# 
-
+@jit(nopython=True,cache=True)  
 def get_extrapolate_matrix(N,phi,gauss_coor):
     """
     Extrapolate_matrix
@@ -220,3 +223,31 @@ def get_extrapolate_matrix(N,phi,gauss_coor):
  
     return np.linalg.inv(N) 
 #-----------------------------------------------------------------------------# 
+
+@jit(nopython=True,cache=True)   
+def extrapolate_stress_strain(stress_gauss,strain_gauss,
+                         stress_nodes,strain_nodes,cont_average,connectivity,
+                        extrapol_vec_stress,extrapol_vec_strain,DOF_stress_strain,
+                        n_Gauss_elem,N,phi_vec,gauss_coor,mesh_type):
+    
+    extrapol_matrix=get_extrapolate_matrix(N,phi_vec,gauss_coor)
+    for M in range(connectivity.shape[0]):       
+        for N in range(DOF_stress_strain):
+            extrapol_vec_strain[::1]=0
+            extrapol_vec_stress[::1]=0
+            for j in range(n_Gauss_elem):
+                extrapol_vec_stress[j]=stress_gauss[M,j*DOF_stress_strain+N]
+                extrapol_vec_strain[j]=strain_gauss[M,j*DOF_stress_strain+N]
+            stress_extra=extrapol_matrix @ extrapol_vec_stress
+            strain_extra=extrapol_matrix @ extrapol_vec_strain
+            
+            for n_node in range(n_Gauss_elem):
+                node=connectivity[M,n_node]
+                stress_nodes[node,N]=stress_extra[n_node]+stress_nodes[node,N]
+                strain_nodes[node,N]=strain_extra[n_node]+strain_nodes[node,N]
+                cont_average[node]=cont_average[node]+1
+    cont_average=cont_average/DOF_stress_strain
+    for i in range(stress_nodes.shape[0]):
+        stress_nodes[i,:]=stress_nodes[i,:]/cont_average[i]
+        strain_nodes[i,:]=strain_nodes[i,:]/cont_average[i]
+    return stress_nodes,strain_nodes

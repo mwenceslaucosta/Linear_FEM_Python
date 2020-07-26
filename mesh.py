@@ -11,9 +11,12 @@ import sys
 
 class MeshFEM:
     """
-    Class to import mesh in .med fromSalome and .inp format (Abaqus) from GMSH
+    Class to import mesh in .med fromSalome, and .inp format (Abaqus) from GMSH
     Elements: C3D8-Hexahedron 
-              Quad4 (To Finish)
+              Quad-4 
+              Triangle-3
+              Tetra-4
+              
     Only one type of element per analysis. 
     Parameters: 
     config_mesh: Dictionary to read and config mesh
@@ -21,7 +24,7 @@ class MeshFEM:
     2-config_mesh['analysis_dimension']: 
         analysis_dimension=3D 
               or 
-       analysis_dimension=2D_plane_stress
+       analysis_dimension=2D
        
     3- vector containing the values of BC groups as detailed below
     
@@ -83,7 +86,7 @@ class MeshFEM:
             self.get_BC_med(config_mesh)
         
         #Thickness 2D Analysis 
-        if config_mesh['analysis_dimension']=='2D_plane_stress':
+        if config_mesh['analysis_dimension']=='2D':
             if 'Thickness_Group_' not in config_mesh:
                 sys.exit('Fatal error: Thickness not informed')
             else:
@@ -92,10 +95,7 @@ class MeshFEM:
                 else:
                     thickness_value=config_mesh['Thickness_Group_']
                     self.thickness_vector=np.ones(self.n_elem)*thickness_value
-                
-        
-       
-      
+                      
 #-----------------------------------------------------------------------------
             
     def get_BC_med (self,config_mesh):
@@ -430,6 +430,7 @@ class MeshFEM:
         cont=0
         if self.analysis_dimension=='3D':
             if "hexahedron" in read_mesh.cells_dict:
+                #Hexa8
                 if "tetra" in read_mesh.cells_dict:
                    sys.exit('Code supports only one element type per mesh.') 
                    
@@ -440,19 +441,31 @@ class MeshFEM:
                 self.n_Gauss_elem=8
                 self.DOF_stress_strain=6
                 self.DOF_elem=self.n_nodes_elem*self.DOF_node_elem
+                self.element_name="hexahedron"
 
                 import hexaedron_8nodes 
                 self.fun_elem=hexaedron_8nodes 
                    
             if "tetra" in read_mesh.cells_dict:
-                sys.exit('Tetrahedral element not implemented.')
+                if self.mesh_type=='Abaqus':
+                    sys.exit('Fatal error: Tetra element implemented only\
+                             for Salome mesh type')
+                
+                #Tetra4
                 self.connectivity=read_mesh.cells_dict['tetra']
                 cont=len(read_mesh.cells_dict['tetra'])
                 self.n_nodes_elem=4
                 self.DOF_node_elem=3
+                self.n_Gauss_elem=1
+                self.DOF_stress_strain=6
+                self.DOF_elem=self.n_nodes_elem*self.DOF_node_elem
+                self.element_name="tetra"
+                import tetrahedron_4nodes 
+                self.fun_elem=tetrahedron_4nodes
 
-        elif self.analysis_dimension=='2D_plane_stress':          
+        elif self.analysis_dimension=='2D':          
             if "quad" in read_mesh.cells_dict: 
+                #Quad4
                 if "triangle" in read_mesh.cells_dict:
                     sys.exit('Code supports only one element type per mesh.')
                     
@@ -463,15 +476,23 @@ class MeshFEM:
                 self.n_Gauss_elem=4
                 self.DOF_stress_strain=3
                 self.DOF_elem=self.n_nodes_elem*self.DOF_node_elem
+                self.element_name="quad"
                 import quad_4nodes
                 self.fun_elem=quad_4nodes
 
             if "triangle" in read_mesh.cells_dict:
-                sys.exit('Triangle element not implemented.')
+                #Triangle3
+
                 self.connectivity=read_mesh.cells_dict['triangle']
                 cont=len(read_mesh.cells_dict['triangle'])
                 self.n_nodes_elem=3
-
+                self.DOF_node_elem=2
+                self.n_Gauss_elem=1
+                self.DOF_stress_strain=3
+                self.DOF_elem=self.n_nodes_elem*self.DOF_node_elem
+                self.element_name="triangle"
+                import triangle_3nodes
+                self.fun_elem=triangle_3nodes
      
         self.n_elem=cont
         self.DOF_tot=self.n_nodes_glob*self.DOF_node_elem

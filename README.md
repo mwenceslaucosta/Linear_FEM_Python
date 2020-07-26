@@ -64,7 +64,7 @@ Exemplo de resultados - Placa com furo central:
 		ou
 		
 		2D Análise - Estado plano de tensão:
-		config_mesh['analysis_dimension']='2D_plane_stress'
+		config_mesh['analysis_dimension']='2D'
 		3.a Para análise 2D é necessário informar o valor de espessura de cada grupo de elementos. 
 			Estes valores são informados no vetor config_mesh['Thickness_Group_']
 			

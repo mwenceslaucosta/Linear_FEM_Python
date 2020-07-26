@@ -22,14 +22,13 @@ To do:
 """
 
 def static_linear(mesh,material_model,mat_prop,out_file_name):
-    
-    Vars=Init_Vars(mesh,material_model)
-    
+        
     #External force
     external_force=Inload(mesh)
     load_vector=external_force.load_vector
     
     #Global Arrays
+    Vars=Init_Vars(mesh,material_model)
     Init_Vars
     
     #Elementary stifiness (Ke) and derivative matrix (B)
@@ -69,11 +68,7 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
     result['displacement']=displacement
     
     #Pos-processing 
-    if mesh.DOF_node_elem==2:
-        extrapol_matrix=mesh.fun_elem.get_extrapolate_matrix(Vars.N,Vars.phi_vec,Vars.gauss_coor)
-    elif  mesh.DOF_node_elem==3:
-        extrapol_matrix=mesh.fun_elem.get_extrapolate_matrix(Vars.N,Vars.phi_vec,Vars.gauss_coor,mesh.mesh_type)
-   
+
     tang_modu=material_model.tg_modulus(Vars.tang_modu,mat_prop)
   
     stress_gauss,strain_gauss,stress_nodes,strain_nodes=pos_processing.pos_static_linear(
@@ -82,7 +77,8 @@ def static_linear(mesh,material_model,mat_prop,out_file_name):
                  mesh.n_Gauss_elem,mesh.DOF_node_elem,displacement,Vars.u_elem,
                 mesh.n_elem,material_model,Vars.stress_nodes,Vars.strain_nodes,
                 Vars.cont_average,Vars.extrapol_vec_stress,
-                Vars.extrapol_vec_strain,mesh.DOF_stress_strain,extrapol_matrix)
+                Vars.extrapol_vec_strain,mesh.DOF_stress_strain,element,
+                Vars.N,Vars.phi_vec,Vars.gauss_coor,mesh.mesh_type)
     
     result['stress_gauss']=stress_gauss
     result['strain_gauss']=strain_gauss
@@ -121,12 +117,16 @@ def imposing_force_BC(mesh,KGlob_csc,KGlob_csc_BC,load_vector,load_subtraction,c
     return load_subtraction
 
 #-----------------------------------------------------------------------------#     
-#@jit(nopython=True,cache=True,parallel=True,nogil=True)     
-def get_Ke_all_and_B_all(mesh,material_model,element,mat_prop,Vars,thickness_vector=0):
-    
+  
+def get_Ke_all_and_B_all(mesh,material_model,element,mat_prop,Vars,thickness_vector=None):
+    """
+    Function compute Ke_all and B_all of all elements
+       
+    """
     
     connectivity=mesh.connectivity
     nodes=mesh.nodes
+    n_nodes_elem=mesh.n_nodes_elem
     mesh_type=mesh.mesh_type
     Ke_all_elem=Vars.Ke_all_elem
     B_all_elem=Vars.B_all_elem
@@ -141,17 +141,16 @@ def get_Ke_all_and_B_all(mesh,material_model,element,mat_prop,Vars,thickness_vec
     K_elem=np.zeros((DOF_elem,DOF_elem))
     gauss_coord=np.zeros((n_Gauss_elem,DOF_node_elem))
     gauss_weight=np.zeros((n_Gauss_elem,DOF_node_elem))
-    elem_coord=np.zeros((n_Gauss_elem,DOF_node_elem))
+    elem_coord=np.zeros((n_nodes_elem,DOF_node_elem))
     jacobian=np.zeros((DOF_node_elem,DOF_node_elem))
     det_Jacobian=np.zeros(n_Gauss_elem)
-    deri_phi_param=np.zeros((DOF_node_elem,n_Gauss_elem))
-    deri_phi_real=np.zeros((DOF_elem,n_Gauss_elem))
+    deri_phi_param=np.zeros((DOF_node_elem,n_nodes_elem))
+    deri_phi_real=np.zeros((n_Gauss_elem*DOF_node_elem,n_nodes_elem))
     B_elem=np.zeros((n_compnts_B,DOF_elem))
     B_t=np.zeros((DOF_elem,DOF_stress_strain))
     B_Gauss=np.zeros((DOF_stress_strain,DOF_elem))
-    for M in range(n_elem):
-
-        
+    
+    for M in range(n_elem):        
         #2D Analysis
         if mesh.DOF_node_elem==2:
             thickness=thickness_vector[M]
@@ -162,9 +161,10 @@ def get_Ke_all_and_B_all(mesh,material_model,element,mat_prop,Vars,thickness_vec
         #3D Analysis 
         elif mesh.DOF_node_elem==3:
             mesh_type=mesh.mesh_type
-            K_elem,B_elem=element.B_and_Ke_elem(gauss_coord,gauss_weight,elem_coord,connectivity[M,:],
-                   jacobian,det_Jacobian,deri_phi_param,deri_phi_real,B_elem,
-                   B_t,B_Gauss,nodes,tang_modu,mesh_type,K_elem)
+            K_elem,B_elem=element.B_and_Ke_elem(gauss_coord,gauss_weight,
+                                    elem_coord,connectivity[M,:],
+                      jacobian,det_Jacobian,deri_phi_param,deri_phi_real,B_elem,
+                                  B_t,B_Gauss,nodes,tang_modu,mesh_type,K_elem)
         
         B_all_elem[M*n_compnts_B:(M*n_compnts_B+n_compnts_B),:]=B_elem[:,:]
         Ke_all_elem[M*DOF_elem:(M*DOF_elem+DOF_elem),:]=K_elem[:,:]

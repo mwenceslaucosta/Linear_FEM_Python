@@ -9,15 +9,14 @@ from mesh import MeshFEM
 import plane_stress_lin_elast_iso_2D 
 from solvers import static_linear
 
-
 #Config Mesh
 config_mesh={}
-config_mesh['mesh_file_name']='plate_with_hole_2D_final.med' 
+config_mesh['mesh_file_name']='plate_with_hole_2D_quad_100x50x6.med' 
 config_mesh['BC_Neumann_point_X_']=np.array([1500])
 config_mesh['BC_Dirichlet_X_']=np.array([0])
 config_mesh['BC_Dirichlet_Y_']=np.array([0])
 # config_mesh['BC_Dirichlet_Z_']=np.array([0])
-config_mesh['analysis_dimension']='2D_plane_stress'
+config_mesh['analysis_dimension']='2D'
 config_mesh['Thickness_Group_']=np.array([6])
 mesh=MeshFEM(config_mesh)
 

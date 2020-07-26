@@ -22,7 +22,7 @@ class Test_FEM_Class:
         
     def test_displacement_cube_2_elements(self):
         """
-        Axial test - 3D Mesh with 2 elements        
+        Axial test - 3D hexaendron  Mesh with 2 elements        
         Linear Elasticity E=210E3 N/mm^2 and poisson=0.29
         Normal force = 200 N
         """
@@ -50,7 +50,7 @@ class Test_FEM_Class:
         
     def test_displacement_cube_1000_elements(self):
         """
-        Axial test - 3D Mesh with 1000 elements        
+        Axial test - 3D hexaendron Mesh with 1000 elements        
         Linear Elasticity E=210E3 N/mm^2 and poisson=0.29
         Normal force = 200 N
         """
@@ -76,7 +76,7 @@ class Test_FEM_Class:
         
     def test_displacement_cantielever_2D(self):
         """
-        Bending test - 2D Mesh        
+        Bending test - 2D Mesh  - quad4       
         Linear Elasticity E=210E3 N/mm^2 and poisson=0.29
         Transversal load = 2000 N
         """
@@ -89,7 +89,7 @@ class Test_FEM_Class:
         config_mesh['BC_Neumann_point_Y_']=np.array([2000])
         config_mesh['BC_Dirichlet_X_']=np.array([0])
         config_mesh['BC_Dirichlet_Y_']=np.array([0])
-        config_mesh['analysis_dimension']='2D_plane_stress'
+        config_mesh['analysis_dimension']='2D'
         config_mesh['Thickness_Group_']=np.array([20])
         out_file_name='FEM_out_test_bending2D_displacement'
         #Config Material model  
@@ -102,7 +102,7 @@ class Test_FEM_Class:
         
     def test_normal_stress_X_cantielever_2D(self):
         """
-        Bending test - 2D Mesh        
+        Bending test - 2D Mesh - quad4    
         Linear Elasticity E=210E3 N/mm^2 and poisson=0.29
         Transversal load = 2000 N
         """
@@ -115,7 +115,7 @@ class Test_FEM_Class:
         config_mesh['BC_Neumann_point_Y_']=np.array([2000])
         config_mesh['BC_Dirichlet_X_']=np.array([0])
         config_mesh['BC_Dirichlet_Y_']=np.array([0])
-        config_mesh['analysis_dimension']='2D_plane_stress'
+        config_mesh['analysis_dimension']='2D'
         config_mesh['Thickness_Group_']=np.array([20])
         out_file_name='FEM_out_test_bending2D_stress_X'
         #Config Material model  
@@ -141,7 +141,7 @@ class Test_FEM_Class:
         config_mesh['BC_Neumann_point_Y_']=np.array([2000])
         config_mesh['BC_Dirichlet_X_']=np.array([0])
         config_mesh['BC_Dirichlet_Y_']=np.array([0])
-        config_mesh['analysis_dimension']='2D_plane_stress'
+        config_mesh['analysis_dimension']='2D'
         config_mesh['Thickness_Group_']=np.array([20])
         out_file_name='FEM_out_test_bending2D_stress_XY'
         #Config Material model  

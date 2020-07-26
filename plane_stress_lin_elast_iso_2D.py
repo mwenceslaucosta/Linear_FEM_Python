@@ -25,9 +25,9 @@ def tg_modulus(tangent_modulus,mat_prop):
     tangent_modulus[0,1]=poisson
     tangent_modulus[1,0]=poisson
     tangent_modulus[2,2]=B
-
-
+    
     return tangent_modulus*A
+    
 #-----------------------------------------------------------------------------# 
 
 @jit(nopython=True,cache=True)    
@@ -39,7 +39,7 @@ def get_stress_and_strain(B_all_elem,tangent_modulus,stress,strain,connectivity,
     
     for elem in range(n_elem):
         u_elem=get_u_elem(connectivity[elem,:],n_nodes_element,DOF,u_glob,u_elem)
-        B_elem=B_all_elem[elem*12:(elem*12+12),::1]    
+        B_elem=B_all_elem[elem*n_gauss*3:(elem*n_gauss*3+n_gauss*3),::1]    
         for gauss in range(n_gauss):
             #B_ele[0:3,:]= B matrix of the first guass point
             B_Gauss=B_elem[gauss*3:(gauss*3+3),::1]
