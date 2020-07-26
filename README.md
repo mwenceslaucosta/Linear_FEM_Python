@@ -15,13 +15,16 @@ Exemplo de resultados - Placa com furo central:
 
 ## Etapas para configuração da Análise 
 
-1.	Primeiro deve ser informado o nome do arquivo contendo a malha. Atualmente está implementado elemento 3D hexaédrico (Brick8) e 2D quadrangular (Quad4). 
-    Os arquivos devem estar no formato .med (Salome) ou no formato .inp (Gmsh-Abaqus).
+1.	Primeiro deve ser informado o nome do arquivo contendo a malha. Atualmente estão implementados os seguintes elementos:
+     Elementos 3D: Hexaedron de 8 nós (Brick8), tetraedro de 4 nós (Tetraedro somente no formato Salome).
+	 Elementos 2D: Quadrangular de 4 nós (Quad4), triângulo de 3 nós.
+	 
+    Os arquivos de malha devem estar no formato .med (Salome) ou no formato .inp (Gmsh-Abaqus).
     A configuração do nome do arquivo é feita no dicionário config_mesh, com a chave “mesh_file_name”, conforme exemplo abaixo. 
 
 		Exemplo: config_mesh['mesh_file_name']='cube1000_bending.inp' 
 
-2.	 Informar valores das condições de contorno (BC) para cada grupo de condição de contorno criado no gerador de malha. 
+2.	 Informar os valores das condições de contorno (BC) para cada grupo de condição de contorno criado no gerador de malha. 
      O código está preparado para receber valores de deslocamento (condições de Dirichlet) e de força nodal pontual (condições de Neumann) nas direções X, Y e Z. Os vetores seguem o seguinte padrão: 
 	
 	Configuração para BC do tipo Neumann nodal nas direções X, Y e Z:
@@ -102,11 +105,11 @@ Exemplo de resultados - Placa com furo central:
 		material_model=plane_stress_lin_elast_iso_2D
 		
 
-	4.b	Informar parâmetros materiais elásticos: Módulo elástico e coeficiente de Poisson no vetor numpy mat_prop. A primeira posição é o módulo de elasticidade, a segunda corresponde ao Poisson.
+	4.b	Informar os parâmetros materiais elásticos: Módulo elástico e coeficiente de Poisson no vetor numpy mat_prop. A primeira posição é o módulo de elasticidade, a segunda corresponde ao Poisson.
       
 	     mat_prop=np.array([210E3,0.29])
 
-5.	Informar nome do arquivo de saída.
+5.	Informar o nome do arquivo de saída.
 		
 		Exemplo: out_file_name='FEM_out'
 		
