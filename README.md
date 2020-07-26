@@ -16,11 +16,13 @@ Exemplo de resultados - Placa com furo central:
 ## Etapas para configuração da Análise 
 
 1.	Primeiro deve ser informado o nome do arquivo contendo a malha. Atualmente estão implementados os seguintes elementos:
-     Elementos 3D: Hexaedron de 8 nós (Brick8), tetraedro de 4 nós (Tetraedro somente no formato Salome).
-	 Elementos 2D: Quadrangular de 4 nós (Quad4), triângulo de 3 nós.
+     
+		Elementos 3D: Hexaedron de 8 nós (Brick8), tetraedro de 4 nós (Tetraedro somente no formato Salome).
+		Elementos 2D: Quadrangular de 4 nós (Quad4), triângulo de 3 nós.
 	 
     Os arquivos de malha devem estar no formato .med (Salome) ou no formato .inp (Gmsh-Abaqus).
-    A configuração do nome do arquivo é feita no dicionário config_mesh, com a chave “mesh_file_name”, conforme exemplo abaixo. 
+    
+	A configuração do nome do arquivo é feita no dicionário config_mesh, com a chave “mesh_file_name”, conforme exemplo abaixo. 
 
 		Exemplo: config_mesh['mesh_file_name']='cube1000_bending.inp' 
 
