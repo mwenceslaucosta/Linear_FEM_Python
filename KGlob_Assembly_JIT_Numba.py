@@ -24,7 +24,6 @@ def KGlobal(n_elem,n_nodes_element,DOF,cont,Dirichlet_DOF,Dirichlet_values,
     for M in range(n_elem):
         K_e[:,:]=Ke_all_elem[M*DOF_elem:(M*DOF_elem+DOF_elem),:]
         cont[0]=0
-        #u_elem=get_u_elem(connectivity[M,:],n_nodes_element,DOF,u_glob,u_elem)                               
         for i in range(n_nodes_element):
             for j in range(DOF):
                 cont[0]+=+1
