@@ -5,6 +5,7 @@ Created on Mon Jun 22 17:55:44 2020
 @author: Matheus Wenceslau
 """
 from numba import jit
+import numpy as np
 
 """
  Plane stress Isotropic linear elastic constitutive model 
@@ -39,10 +40,11 @@ def get_stress_and_strain(B_all_elem,tangent_modulus,stress,strain,connectivity,
     
     for elem in range(n_elem):
         u_elem=get_u_elem(connectivity[elem,:],n_nodes_element,DOF,u_glob,u_elem)
-        B_elem=B_all_elem[elem*n_gauss*3:(elem*n_gauss*3+n_gauss*3),::1]    
+        u_elem_contig=np.ascontiguousarray(u_elem)
+        B_elem=B_all_elem[elem*n_gauss*3:(elem*n_gauss*3+n_gauss*3),:]    
         for gauss in range(n_gauss):
             #B_ele[0:3,:]= B matrix of the first guass point
-            B_Gauss=B_elem[gauss*3:(gauss*3+3),::1]
+            B_Gauss=np.ascontiguousarray(B_elem[gauss*3:(gauss*3+3),:])
             strain_gauss=B_Gauss @ u_elem
             stress_gauss=tangent_modulus @ strain_gauss
             strain[elem,gauss*3:(gauss*3+3)]=strain_gauss[:]
