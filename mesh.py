@@ -11,49 +11,12 @@ import sys
 
 class MeshFEM:
     """
-    Class to import mesh in .med fromSalome, and .inp format (Abaqus) from GMSH
+    Class to import mesh in .med from Salome, and .inp format (Abaqus) from GMSH
     Elements: C3D8-Hexahedron 
               Quad-4 
               Triangle-3
               Tetra-4
               
-    Only one type of element per analysis. 
-    Parameters: 
-    config_mesh: Dictionary to read and config mesh
-    1- config_mesh['mesh_file_name']: Name of the mesh file in in .inp format 
-    2-config_mesh['analysis_dimension']: 
-        analysis_dimension=3D 
-              or 
-       analysis_dimension=2D
-       
-    3- vector containing the values of BC groups as detailed below
-    
-    Attention to the six possible names of the groups in the dic config_mesh:
-        BC_Neumann_point_X_
-        BC_Neumann_point_Y_     for nodal force (only implemented for now)
-        BC_Neumann_point_Z_
-        
-        BC_Dirichlet_X_
-        BC_Dirichlet_Y_
-        BC_Dirichlet_Z_
-        
-        Example:config_mesh['BC_Neumann_point_X_']
-        BC_Neumann_X_ --> 
-        vector cointaning the nodal Neumman BC values in X direction of each group.
-            example for 2 groups: config_mesh['BC_Neumann_point_X_']=[100 200]
-   
-    ----------------------------!!!ATTENTION!!!------------------------------
-    The names of the Boundary Condition groups should follow the standard:
-    Neuman BC in x direction: 
-        Nodal force Group 0: BC_Neumann_point_X_0
-        Nodal force Group 1: BC_Neumann_point_X_1 ....
-        and so on for the Y and Z direction groups. 
-        
-    Dirichlet BC in x direction: 
-        Group 0: BC_Dirichlet_X_0
-        Group 1: BC_Dirichlet_X_1 ....
-        and so on for the Y and Z direction groups.
-    """
 #-----------------------------------------------------------------------------    
     def __init__(self,config_mesh):
         """
