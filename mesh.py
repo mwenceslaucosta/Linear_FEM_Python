@@ -36,7 +36,7 @@ class MeshFEM:
             #Salome Format - .med 
             self.mesh_type='Salome'
         else:
-            sys.exit('Fatal error: Mesh format no accepted')
+            sys.exit('Fatal error: Mesh format not accepted')
         
         self.get_connectivity(self.meshio_)
 
@@ -64,7 +64,7 @@ class MeshFEM:
     def get_BC_med (self,config_mesh):
         """
         Method to get the list of nodes and values of the Boundary Conditions(BC)
-        in .med (salome) format
+        in .med format (salome).
         
         direction_BC - Direction of the BC
         0 - for x 
@@ -141,7 +141,7 @@ class MeshFEM:
             self.list_BC_med(config_mesh,name_prefix,suffix,direction_BC,node,BC_key)
         else: 
             msg='Falal error: '+name_BC+' is not defined in mesh file or\
-                     name does not confer '
+                     or the names does not match. '
             sys.exit(msg)
             
 #-----------------------------------------------------------------------------
@@ -156,8 +156,8 @@ class MeshFEM:
         if len(config_mesh[name_prefix]) != suffix+1:
             msg1=('Fatal error: '+'error in '+name_group)
             msg2=('. Number of numeric values in config_mesh['+name_group)
-            msg3= ('] do not coincide with the BC. Check the number of\
-                          groups and the number of numerical values entered.')
+            msg3= ('] does not coincide with the BC. Check the number of\
+                          groups and the number of numerical values informed.')
             msg=msg1+msg2+msg3
             sys.exit(msg)
             
@@ -179,14 +179,15 @@ class MeshFEM:
     def get_BC_inp(self,read_mesh,config_mesh):
         """
         Method to get the list of nodes and values of the Boundary Conditions(BC)
+        in .inp format (Abaqus from GMSH)
         
         direction_BC - Direction of the BC
         0 - for x 
         1 - for y 
         2 - for z 
         
-        self.Neumann_pt_nodes: Vector containing all nodes with nodal Neumman BC 
-        self.Neumann_pt_values: Vector containing BC value of each DOF
+        self.Neumann_pt_nodes: Vector containing all nodes with nodal Neumman BC. 
+        self.Neumann_pt_values: Vector containing BC value of each DOF.
         self.Neumann_pt_DOF: Vector containing nodal Neumman BC DOF.
         
         self.Dirichlet_nodes: Vector containing all nodes with Dirichlet BC 
@@ -263,7 +264,7 @@ class MeshFEM:
             self.Dirichlet_DOF_sorted=np.sort(self.Dirichlet_DOF)
         else:
             sys.exit('Fatal error: No were informed the Dirichlet Boundary\
-                     conditions or the names not check')
+                     conditions or the names does not match.')
 
         #Saving number of BC groups
         self.n_BC=cont
@@ -290,9 +291,9 @@ class MeshFEM:
         Creates a list cointaning the nodal vector of BC and it's value for 
         abaqus format.
         
-        The first position of the list are the are the nodes of each group
+        The first position of the list are the nodes of each group.
         The second position of the list are the values of each group.
-        The third position contains vectors with the degrees of freedom of each group
+        The third position contains vectors with the degrees of freedom of each group.
         
         direction_BC - Direction of the BC
         0 - for x 
@@ -314,13 +315,13 @@ class MeshFEM:
             if n_BC_of_group<(cont+1):
                 msg1=('Fatal error: '+'error in '+name_group)
                 msg2=('. Number of numeric values in config_mesh['+name_group)
-                msg3= ('] do not coincide with the BC. Check the number of\
+                msg3= ('] does not coincide with the BC. Check the number of\
                       groups and the number of numerical values entered.')
                 msg=msg1+msg2+msg3
                 sys.exit(msg)
             if name_BC not in read_mesh.point_sets:
                 msg='Falal error: '+name_BC+' is not defined in mesh file or\
-                     name does not confer '
+                     the name does not confer '
                 sys.exit(msg)  
             #Storing nodes of the group
             BC_nodes[0][cont]=read_mesh.point_sets[name_BC]
@@ -356,7 +357,7 @@ class MeshFEM:
         if n_values != n_BC:
             msg1=('Fatal error: '+'error in '+name_group)
             msg2=('. Number of numeric values in config_mesh['+name_group)
-            msg3= ('] do not coincide with the BC. Check the number of\
+            msg3= ('] does not coincide with the BC. Check the number of\
                    groups and the number of numerical values entered.')
             msg=msg1+msg2+msg3
             sys.exit(msg)
@@ -388,7 +389,7 @@ class MeshFEM:
 #-----------------------------------------------------------------------------
     def get_connectivity(self,read_mesh):
         """
-        Call methods to allocate connectivity and nodes coordi
+        Call methods to allocate connectivity and nodes coord
         """
         cont=0
         if self.analysis_dimension=='3D':
